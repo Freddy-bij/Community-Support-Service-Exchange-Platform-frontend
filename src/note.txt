@@ -1,0 +1,10 @@
+Primary: #2C7A7B (Teal/Green) - Trust, growth, community
+Secondary: #F59E0B (Warm Orange) - Energy, friendliness, action
+Accent: #10B981 (Green) - Success, positive actions
+Neutral: rgb(243, 244, 246) (Light Gray) - Background
+
+Text: #1F2937 (Dark Gray)
+Use your primary color for main CTAs (Create Request, Respond buttons)
+Use secondary for less critical actions (filters, categories)
+Keep backgrounds light for readability
+Use accent colors for success messages and notifications
