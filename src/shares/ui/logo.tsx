@@ -10,7 +10,11 @@ const Logo = () => {
         </div>
         <div>
             <h1 className="text-xl font-bold  text-[#2C7A7B]">Community Support </h1>
+<<<<<<< HEAD
             <p className="text-gray-600 text-sm text-center">Services Exchanges Platform</p>
+=======
+            <p className="text-gray-600 text-sm text-center">Service Exchanges Platform</p>
+>>>>>>> 9911ea0 (feat/ add welcom page and autication form pages)
         </div>
         </div>
         </Link>
