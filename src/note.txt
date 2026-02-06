@@ -8,3 +8,7 @@ Use your primary color for main CTAs (Create Request, Respond buttons)
 Use secondary for less critical actions (filters, categories)
 Keep backgrounds light for readability
 Use accent colors for success messages and notifications
+
+
+main "{/* flex-1  bg-gray-200  lg:ml-72  flex flex-col  overflow-y-auto */}"
+sidebar "// fixed inset-y-0 left-0 z-50 w-72 h-screen"
