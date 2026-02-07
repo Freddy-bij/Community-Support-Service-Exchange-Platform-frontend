@@ -1,5 +1,4 @@
 import { Award, Info, Star, TrendingUp, Users } from "lucide-react"
-import { useState } from "react"
 import { Link } from "react-router"
 
 interface LeaderboardEntry {
@@ -10,8 +9,9 @@ interface LeaderboardEntry {
   helped: number
   joinDate: string
 }
-const LearderBoard = () => {
-    const [topHelpers, setTopHelpers] = useState<LeaderboardEntry[]>([
+
+const LeaderBoard = () => {
+  const topHelpers: LeaderboardEntry[] = [
     { rank: 1, name: 'Sarah Smith', rating: 4.95, completed: 45, helped: 120, joinDate: '2023-06-15' },
     { rank: 2, name: 'John Doe', rating: 4.87, completed: 38, helped: 95, joinDate: '2023-07-22' },
     { rank: 3, name: 'Emma Wilson', rating: 4.82, completed: 35, helped: 88, joinDate: '2023-08-10' },
@@ -20,14 +20,15 @@ const LearderBoard = () => {
     { rank: 6, name: 'David Johnson', rating: 4.62, completed: 25, helped: 60, joinDate: '2023-11-01' },
     { rank: 7, name: 'Lisa Martinez', rating: 4.58, completed: 22, helped: 52, joinDate: '2024-01-08' },
     { rank: 8, name: 'James Taylor', rating: 4.52, completed: 20, helped: 48, joinDate: '2024-01-15' },
-  ])
+  ]
 
-  const [stats, setStats] = useState({
+  const stats = {
     totalMembers: 1245,
     totalRequests: 3847,
     completedRequests: 2956,
     communityRating: 4.71,
-  })
+  }
+
   return (
     <div className="min-h-screen bg-background">
       
@@ -204,4 +205,4 @@ const LearderBoard = () => {
   )
 }
 
-export default LearderBoard
+export default LeaderBoard

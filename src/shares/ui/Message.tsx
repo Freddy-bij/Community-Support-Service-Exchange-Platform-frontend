@@ -2,9 +2,16 @@ import { useState } from "react";
 import ConversationItem from "./ConversationItem";
 import ChatWindow from "./chatWindow";
 
-
+interface Conversation {
+  id: number;
+  name: string;
+  lastMessage: string;
+  date: string;
+  unread: number;
+  messages: { from: string; text: string; time: string }[];
+}
 const Message = () => {
-  const conversations = [
+  const conversations:Conversation[] = [
     {
       id: 1,
       name: "John Doe",
@@ -44,7 +51,7 @@ const Message = () => {
     },
   ];
 
-  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
   return (
     <div className="flex min-h-screen ">
