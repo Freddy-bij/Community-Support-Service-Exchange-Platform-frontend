@@ -9,9 +9,6 @@ interface LeaderboardEntry {
   helped: number
   joinDate: string
 }
-
-const LearderBoard = () => {
-  // FIXED: Defined as constants to avoid "unused setter" errors
   const topHelpers: LeaderboardEntry[] = [
     { rank: 1, name: 'Sarah Smith', rating: 4.95, completed: 45, helped: 120, joinDate: '2023-06-15' },
     { rank: 2, name: 'John Doe', rating: 4.87, completed: 38, helped: 95, joinDate: '2023-07-22' },
@@ -23,13 +20,14 @@ const LearderBoard = () => {
     { rank: 8, name: 'James Taylor', rating: 4.52, completed: 20, helped: 48, joinDate: '2024-01-15' },
   ]
 
-  const stats = {
+    const stats = {
     totalMembers: 1245,
     totalRequests: 3847,
     completedRequests: 2956,
     communityRating: 4.71,
   }
-
+const LearderBoard = () => {
+  // FIXED: Defined as constants to avoid "unused setter" errors
   return (
     <div className="min-h-screen bg-background">
       <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-12">
