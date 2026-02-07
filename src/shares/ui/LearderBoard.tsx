@@ -10,7 +10,7 @@ interface LeaderboardEntry {
   joinDate: string
 }
 
-const LeaderBoard = () => {
+const LearderBoard = () => {
   const topHelpers: LeaderboardEntry[] = [
     { rank: 1, name: 'Sarah Smith', rating: 4.95, completed: 45, helped: 120, joinDate: '2023-06-15' },
     { rank: 2, name: 'John Doe', rating: 4.87, completed: 38, helped: 95, joinDate: '2023-07-22' },
@@ -205,4 +205,4 @@ const LeaderBoard = () => {
   )
 }
 
-export default LeaderBoard
+export default LearderBoard

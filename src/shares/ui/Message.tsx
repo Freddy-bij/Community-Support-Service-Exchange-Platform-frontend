@@ -2,16 +2,23 @@ import { useState } from "react";
 import ConversationItem from "./ConversationItem";
 import ChatWindow from "./chatWindow";
 
+interface Message {
+  from: string;
+  text: string;
+  time: string;
+}
+
 interface Conversation {
   id: number;
   name: string;
   lastMessage: string;
   date: string;
   unread: number;
-  messages: { from: string; text: string; time: string }[];
+  messages: Message[];
 }
+
 const Message = () => {
-  const conversations:Conversation[] = [
+  const conversations: Conversation[] = [
     {
       id: 1,
       name: "John Doe",
