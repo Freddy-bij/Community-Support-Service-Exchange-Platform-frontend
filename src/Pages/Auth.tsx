@@ -2,29 +2,9 @@
 import { useState } from 'react';
 import RegisterForm from '../shares/ui/Register';
 import LoginForm from '../shares/ui/Login';
-<<<<<<< HEAD
-<<<<<<< HEAD
 const Auth = () => {
 
   const [isRegistering, setIsRegistering] = useState(true);
-=======
-
-
-
-const Auth = () => {
-
-  const [isRegistering, setIsRegistering] = useState(true);
-
-
-
-
-
->>>>>>> 9911ea0 (feat/ add welcom page and autication form pages)
-=======
-const Auth = () => {
-
-  const [isRegistering, setIsRegistering] = useState(true);
->>>>>>> 888506a (add user dashboard)
   return (
     <div className="h-screen overflow-hidden bg-gray-200 flex justify-center items-center">
        
