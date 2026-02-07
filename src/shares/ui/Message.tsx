@@ -57,7 +57,6 @@ interface Conversation {
   ];
 const MessagePage = () => {
 
-
   // FIXED: Explicitly defined state type to allow both null and Conversation object
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
