@@ -222,11 +222,11 @@ const CommunityServicePlatform: React.FC = () => {
       `}</style>
 
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-teal-50 relative overflow-x-hidden">
-        {/* Background decoration */}
+        
         <div className="fixed top-[-50%] right-[-20%] w-[800px] h-[800px] rounded-full bg-gradient-radial from-teal-600/8 to-transparent animate-float pointer-events-none" />
 
-        <div className="w-[50%] mx-auto py-8 px-4 relative z-10">
-          {/* Header */}
+        <div className="w-[80%] mx-auto py-8 px-4 relative z-10">
+          
           <div className="bg-white rounded-2xl p-6 mb-8 shadow-lg border-l-4 border-teal-600 animate-slideDown">
             <button className="inline-flex items-center gap-2 text-teal-600 font-medium transition-all duration-300 hover:bg-teal-600/10 px-4 py-2 rounded-lg hover:-translate-x-1">
               <ArrowLeft size={18} />
@@ -234,29 +234,29 @@ const CommunityServicePlatform: React.FC = () => {
             </button>
           </div>
 
-          {/* Main Content */}
+          
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 animate-fadeIn">
-            {/* Left Column */}
+           
             <div 
               className="bg-white rounded-3xl p-10 shadow-xl relative overflow-hidden transition-transform duration-100"
               style={{
                 transform: `translate(${(mousePosition.x - 0.5) * 4}px, ${(mousePosition.y - 0.5) * 4}px)`
               }}
             >
-              {/* Top gradient bar */}
+             
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-600 via-teal-400 to-orange-500" />
 
-              {/* Status Badge */}
+            
               <span className="inline-block bg-teal-400 text-white px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide mb-4 shadow-lg">
                 {request.status}
               </span>
 
-              {/* Title */}
+              
               <h1 className="font-fraunces text-4xl font-bold text-gray-900 mb-6 leading-tight">
                 {request.title}
               </h1>
 
-              {/* Meta Info */}
+             
               <div className="flex flex-wrap gap-8 mb-8 pb-6 border-b-2 border-dashed border-gray-200">
                 <div className="flex items-center gap-2 text-gray-600">
                   <MapPin className="text-teal-600" size={18} />
@@ -272,12 +272,12 @@ const CommunityServicePlatform: React.FC = () => {
                 </div>
               </div>
 
-              {/* Description */}
+            
               <div className="text-lg leading-relaxed text-gray-900 mb-10 bg-teal-600/5 p-6 rounded-xl border-l-3 border-l-4 border-teal-600">
                 {request.description}
               </div>
 
-              {/* Posted By */}
+            
               <div className="bg-gradient-to-br from-teal-600/5 to-teal-400/5 rounded-2xl p-6 mb-8">
                 <h3 className="text-sm uppercase tracking-wider text-gray-600 font-semibold mb-4">
                   Posted by
@@ -304,7 +304,6 @@ const CommunityServicePlatform: React.FC = () => {
                 </div>
               </div>
 
-              {/* Responses Section */}
               <div className="mt-8">
                 <div className="flex items-center gap-2 mb-6 text-lg font-semibold">
                   <MessageSquare size={24} className="text-teal-600" />
@@ -320,9 +319,9 @@ const CommunityServicePlatform: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Sidebar */}
+           
             <div className="flex flex-col gap-6">
-              {/* Offer Help Card */}
+             
               <div 
                 className="bg-white rounded-2xl p-8 shadow-xl transition-transform duration-100"
                 style={{
@@ -349,7 +348,6 @@ const CommunityServicePlatform: React.FC = () => {
                 </form>
               </div>
 
-              {/* Share Card */}
               <div 
                 className="bg-white rounded-2xl p-8 shadow-xl transition-transform duration-100"
                 style={{
@@ -370,7 +368,7 @@ const CommunityServicePlatform: React.FC = () => {
                 </div>
               </div>
 
-              {/* Safety Tips Card */}
+              
               <div 
                 className="bg-white rounded-2xl p-8 shadow-xl transition-transform duration-100"
                 style={{

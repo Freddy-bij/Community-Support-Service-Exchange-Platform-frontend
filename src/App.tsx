@@ -12,14 +12,12 @@ const App = () => {
     <>
     
     <Routes>
-
       <Route path="/dashboard" element={<Dashboard/>}/>
       <Route  element={<Layout/>} >
       <Route path="/" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
+       <Route path="community-services" element={<CommunityServicePlatform/>}/>
       </Route>
-      <Route path="community-services" element={<CommunityServicePlatform/>}/>
-      
     </Routes>
     
   
