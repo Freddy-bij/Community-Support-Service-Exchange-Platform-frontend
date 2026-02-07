@@ -2,7 +2,7 @@ import { useState } from "react";
 import ConversationItem from "./ConversationItem";
 import ChatWindow from "./chatWindow";
 
-interface Message {
+interface MessageContent {
   from: string;
   text: string;
   time: string;
@@ -14,10 +14,10 @@ interface Conversation {
   lastMessage: string;
   date: string;
   unread: number;
-  messages: Message[];
+  messages: MessageContent[];
 }
 
-const Message = () => {
+const MessagePage = () => {
   const conversations: Conversation[] = [
     {
       id: 1,
@@ -58,23 +58,22 @@ const Message = () => {
     },
   ];
 
+  // FIXED: Explicitly defined state type to allow both null and Conversation object
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
   return (
-    <div className="flex min-h-screen ">
-
+    <div className="flex min-h-screen">
       <main className="flex-1 p-8">
         <h1 className="text-2xl font-bold mb-6">Messages</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[75vh]">
-       
-          <div className="bg-white rounded-xl  p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl p-4 overflow-y-auto border shadow-sm">
             <h2 className="font-semibold mb-3">Conversations</h2>
 
             <input
               type="text"
               placeholder="Search conversations..."
-              className="w-full mb-4 px-3 py-2 border border-gray-200 rounded-lg text-sm"
+              className="w-full mb-4 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
 
             <div className="space-y-2">
@@ -82,12 +81,14 @@ const Message = () => {
                 <ConversationItem
                   key={conv.id}
                   conversation={conv}
+                  // FIXED: Optional chaining (?.) handles the null state safely
                   isActive={selectedConversation?.id === conv.id}
                   onClick={() => setSelectedConversation(conv)}
                 />
               ))}
             </div>
           </div>
+          
           <div className="md:col-span-2">
             <ChatWindow conversation={selectedConversation} />
           </div>
@@ -97,4 +98,4 @@ const Message = () => {
   );
 };
 
-export default Message;
+export default MessagePage;
