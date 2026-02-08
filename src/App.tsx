@@ -7,6 +7,9 @@ import Dashboard from "./Pages/Dashoard"
 import CommunityServicePlatform from "./Pages/communityPlatform"
 import AdminLayout from "./shares/ui/AdminLayout"
 import AdminDashboard from "./Pages/Admin/AdminDashboard"
+import ContentModeration from "./Pages/Admin/ContentModeration"
+import PostsManagement from "./Pages/Admin/PostsManagement"
+import CategoriesManagement from "./Pages/Admin/CategoriesManagement"
 
 
 const App = () => {
@@ -16,6 +19,9 @@ const App = () => {
     <Routes>
       <Route path="/admin" element={<AdminLayout/>}>
         <Route index element={<AdminDashboard/>} />
+        <Route path="moderation" element={<ContentModeration/>} />
+        <Route path="posts" element={<PostsManagement/>} />
+        <Route path="categories" element={<CategoriesManagement/>} />
       </Route>
       <Route path="/dashboard" element={<Dashboard/>}/>
       <Route  element={<Layout/>} >
