@@ -1,32 +1,56 @@
-import { useState } from "react"
-import { FiCheck, FiX, FiEye } from "react-icons/fi"
+import { useEffect, useState } from "react"
+import { FiCheck, FiX } from "react-icons/fi"
+import { getAbuseReports, approveAbuseReport, rejectAbuseReport } from "../../services/api"
 
 const ContentModeration = () => {
-  const [items, setItems] = useState([
-    { id: 1, type: "Post", title: "Inappropriate content", author: "User123", reportedBy: "User456", severity: "high", status: "pending", date: "2024-02-08" },
-    { id: 2, type: "Comment", title: "Spam link", author: "User789", reportedBy: "User101", severity: "medium", status: "pending", date: "2024-02-08" },
-    { id: 3, type: "Post", title: "Offensive language", author: "User234", reportedBy: "User567", severity: "high", status: "pending", date: "2024-02-07" },
-    { id: 4, type: "Comment", title: "Duplicate content", author: "User345", reportedBy: "User678", severity: "low", status: "pending", date: "2024-02-07" },
-  ])
+  const [items, setItems] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
 
-  const handleApprove = (id: number) => {
-    setItems(items.map(item => item.id === id ? { ...item, status: "approved" } : item))
+  useEffect(() => {
+    fetchReports()
+  }, [])
+
+  const fetchReports = async () => {
+    try {
+      setLoading(true)
+      setError("")
+      const data = await getAbuseReports()
+      setItems(Array.isArray(data) ? data : data.data || [])
+    } catch (err: any) {
+      setError(err.message || "Failed to load reports")
+      console.error("Error fetching reports:", err)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleReject = (id: number) => {
-    setItems(items.map(item => item.id === id ? { ...item, status: "rejected" } : item))
+  const handleApprove = async (id: string) => {
+    try {
+      setActionLoading(id)
+      await approveAbuseReport(id)
+      setItems(items.map(item => item._id === id ? { ...item, status: "approved" } : item))
+    } catch (err: any) {
+      setError(err.message || "Failed to approve report")
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleReject = async (id: string) => {
+    try {
+      setActionLoading(id)
+      await rejectAbuseReport(id)
+      setItems(items.map(item => item._id === id ? { ...item, status: "rejected" } : item))
+    } catch (err: any) {
+      setError(err.message || "Failed to reject report")
+    } finally {
+      setActionLoading(null)
+    }
   }
 
   const pendingItems = items.filter(item => item.status === "pending")
-
-  const getSeverityColor = (severity: string) => {
-    switch(severity) {
-      case 'high': return { bg: '#fee2e2', text: '#991b1b' }
-      case 'medium': return { bg: '#fef3c7', text: '#92400e' }
-      case 'low': return { bg: '#dcfce7', text: '#15803d' }
-      default: return { bg: '#f3f4f6', text: '#374151' }
-    }
-  }
 
   const getStatusColor = (status: string) => {
     switch(status) {
@@ -49,77 +73,87 @@ const ContentModeration = () => {
         </div>
       </div>
 
-      <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-            <tr>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Type</th>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Content</th>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Author</th>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Reported By</th>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Severity</th>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Status</th>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody style={{ borderCollapse: 'collapse' }}>
-            {items.map((item, idx) => (
-              <tr key={item.id} style={{ borderBottom: idx < items.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
-                <td style={{ padding: '16px 24px' }}>
-                  <span style={{ padding: '4px 12px', backgroundColor: '#dbeafe', color: '#1e40af', fontSize: '12px', borderRadius: '9999px' }}>{item.type}</span>
-                </td>
-                <td style={{ padding: '16px 24px' }}>
-                  <div>
-                    <p style={{ fontWeight: '500', fontSize: '14px', margin: 0 }}>{item.title}</p>
-                    <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}>{item.date}</p>
-                  </div>
-                </td>
-                <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>{item.author}</td>
-                <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>{item.reportedBy}</td>
-                <td style={{ padding: '16px 24px' }}>
-                  <span style={{ padding: '4px 12px', backgroundColor: getSeverityColor(item.severity).bg, color: getSeverityColor(item.severity).text, fontSize: '12px', borderRadius: '9999px' }}>
-                    {item.severity.charAt(0).toUpperCase() + item.severity.slice(1)}
-                  </span>
-                </td>
-                <td style={{ padding: '16px 24px' }}>
-                  <span style={{ padding: '4px 12px', backgroundColor: getStatusColor(item.status).bg, color: getStatusColor(item.status).text, fontSize: '12px', borderRadius: '9999px' }}>
-                    {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                  </span>
-                </td>
-                <td style={{ padding: '16px 24px' }}>
-                  {item.status === 'pending' && (
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        onClick={() => handleApprove(item.id)}
-                        style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#dcfce7', color: '#15803d', border: 'none', cursor: 'pointer' }}
-                        title="Approve"
-                      >
-                        <FiCheck size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleReject(item.id)}
-                        style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#fee2e2', color: '#991b1b', border: 'none', cursor: 'pointer' }}
-                        title="Reject"
-                      >
-                        <FiX size={16} />
-                      </button>
-                      <button
-                        style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#f3f4f6', color: '#374151', border: 'none', cursor: 'pointer' }}
-                        title="View"
-                      >
-                        <FiEye size={16} />
-                      </button>
-                    </div>
-                  )}
-                  {item.status !== 'pending' && (
-                    <span style={{ fontSize: '12px', color: '#6b7280' }}>Already {item.status}</span>
-                  )}
-                </td>
+      {error && (
+        <div style={{ backgroundColor: '#fee2e2', padding: '12px 16px', borderRadius: '8px', color: '#991b1b', marginBottom: '16px', fontSize: '14px' }}>
+          ⚠️ {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: 'white', borderRadius: '8px' }}>
+          <p style={{ color: '#6b7280' }}>Loading reports...</p>
+        </div>
+      ) : items.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: 'white', borderRadius: '8px' }}>
+          <p style={{ color: '#6b7280' }}>No reports to moderate</p>
+        </div>
+      ) : (
+        <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+              <tr>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Type</th>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Content</th>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Reason</th>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Reported By</th>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Status</th>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody style={{ borderCollapse: 'collapse' }}>
+              {items.map((item, idx) => (
+                <tr key={item._id} style={{ borderBottom: idx < items.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                  <td style={{ padding: '16px 24px' }}>
+                    <span style={{ padding: '4px 12px', backgroundColor: '#dbeafe', color: '#1e40af', fontSize: '12px', borderRadius: '9999px' }}>
+                      {item.type || "Post"}
+                    </span>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div>
+                      <p style={{ fontWeight: '500', fontSize: '14px', margin: 0 }}>{(item.description || "N/A").substring(0, 40)}</p>
+                      <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}>
+                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "N/A"}
+                      </p>
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>{item.reason || "No reason"}</td>
+                  <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>{item.reportedBy?.name || "Unknown"}</td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <span style={{ padding: '4px 12px', backgroundColor: getStatusColor(item.status).bg, color: getStatusColor(item.status).text, fontSize: '12px', borderRadius: '9999px' }}>
+                      {item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : "Pending"}
+                    </span>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    {item.status === 'pending' && (
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          onClick={() => handleApprove(item._id)}
+                          disabled={actionLoading === item._id}
+                          style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#dcfce7', color: '#15803d', border: 'none', cursor: 'pointer', opacity: actionLoading === item._id ? 0.6 : 1 }}
+                          title="Approve"
+                        >
+                          <FiCheck size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleReject(item._id)}
+                          disabled={actionLoading === item._id}
+                          style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#fee2e2', color: '#991b1b', border: 'none', cursor: 'pointer', opacity: actionLoading === item._id ? 0.6 : 1 }}
+                          title="Reject"
+                        >
+                          <FiX size={16} />
+                        </button>
+                      </div>
+                    )}
+                    {item.status !== 'pending' && (
+                      <span style={{ fontSize: '12px', color: '#6b7280' }}>Already {item.status}</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }
