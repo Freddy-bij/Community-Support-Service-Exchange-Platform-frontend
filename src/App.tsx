@@ -10,6 +10,9 @@ import AdminDashboard from "./Pages/Admin/AdminDashboard"
 import ContentModeration from "./Pages/Admin/ContentModeration"
 import PostsManagement from "./Pages/Admin/PostsManagement"
 import CategoriesManagement from "./Pages/Admin/CategoriesManagement"
+import UsersManagement from "./Pages/Admin/UsersManagement"
+import RequestsManagement from "./Pages/Admin/RequestsManagement"
+import AdminSettings from "./Pages/Admin/AdminSettings"
 
 
 const App = () => {
@@ -22,6 +25,9 @@ const App = () => {
         <Route path="moderation" element={<ContentModeration/>} />
         <Route path="posts" element={<PostsManagement/>} />
         <Route path="categories" element={<CategoriesManagement/>} />
+        <Route path="users" element={<UsersManagement/>} />
+        <Route path="requests" element={<RequestsManagement/>} />
+        <Route path="settings" element={<AdminSettings/>} />
       </Route>
       <Route path="/dashboard" element={<Dashboard/>}/>
       <Route  element={<Layout/>} >

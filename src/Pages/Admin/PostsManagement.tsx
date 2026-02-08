@@ -20,67 +20,65 @@ const PostsManagement = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h1 className="text-2xl font-bold">Manage Posts</h1>
-          <p className="text-gray-500">View and manage all platform posts</p>
+          <h1 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>Manage Posts</h1>
+          <p style={{ color: '#6b7280', margin: '8px 0 0 0' }}>View and manage all platform posts</p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-lg">
-          <p className="text-sm text-gray-600">Total: <span className="font-bold">{posts.length}</span></p>
+        <div style={{ backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>Total: <span style={{ fontWeight: 'bold' }}>{posts.length}</span></p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
+      <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Title</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Author</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Category</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Views</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Date</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
+              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Title</th>
+              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Author</th>
+              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Category</th>
+              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Status</th>
+              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Views</th>
+              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Date</th>
+              <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y">
-            {posts.map((post) => (
-              <tr key={post.id} className="hover:bg-gray-50 transition">
-                <td className="px-6 py-4">
-                  <p className="font-medium text-sm">{post.title}</p>
+          <tbody>
+            {posts.map((post, idx) => (
+              <tr key={post.id} style={{ borderBottom: idx < posts.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                <td style={{ padding: '16px 24px' }}>
+                  <p style={{ fontWeight: '500', fontSize: '14px', margin: 0 }}>{post.title}</p>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">{post.author}</td>
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">{post.category}</span>
+                <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>{post.author}</td>
+                <td style={{ padding: '16px 24px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#e9d5ff', color: '#6b21a8', fontSize: '12px', borderRadius: '9999px' }}>{post.category}</span>
                 </td>
-                <td className="px-6 py-4">
-                  <span className={`px-3 py-1 text-xs rounded-full ${
-                    post.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                  }`}>
+                <td style={{ padding: '16px 24px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: post.status === 'published' ? '#dcfce7' : '#f3f4f6', color: post.status === 'published' ? '#15803d' : '#374151', fontSize: '12px', borderRadius: '9999px' }}>
                     {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">{post.views}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{post.date}</td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                    <button className="p-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition" title="View">
+                <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>{post.views}</td>
+                <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>{post.date}</td>
+                <td style={{ padding: '16px 24px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#dbeafe', color: '#1e40af', border: 'none', cursor: 'pointer' }} title="View">
                       <FiEye size={16} />
                     </button>
-                    <button className="p-2 rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition" title="Edit">
+                    <button style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#fed7aa', color: '#92400e', border: 'none', cursor: 'pointer' }} title="Edit">
                       <FiEdit2 size={16} />
                     </button>
                     {post.status === 'draft' && (
                       <button
                         onClick={() => handlePublish(post.id)}
-                        className="px-3 py-1 bg-[#2C7A7B] text-white text-xs rounded hover:opacity-90 transition"
+                        style={{ padding: '4px 12px', backgroundColor: '#2C7A7B', color: 'white', fontSize: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
                       >
                         Publish
                       </button>
                     )}
                     <button
                       onClick={() => handleDelete(post.id)}
-                      className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
+                      style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#fee2e2', color: '#991b1b', border: 'none', cursor: 'pointer' }}
                       title="Delete"
                     >
                       <FiTrash2 size={16} />

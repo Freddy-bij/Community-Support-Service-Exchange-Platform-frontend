@@ -3,11 +3,11 @@ import AdminSidebar from "./AdminSidebar"
 
 const AdminLayout = () => {
   return (
-    <div className="flex bg-gray-50 min-h-screen">
-      <div className="bg-[#2C7A7B] fixed inset-y-0 left-0 z-50 w-72 ">
+    <div style={{ display: 'flex', height: '100vh', backgroundColor: '#f3f4f6' }}>
+      <div style={{ width: '250px', backgroundColor: '#2C7A7B', position: 'fixed', height: '100vh', overflowY: 'auto', zIndex: 50 }}>
         <AdminSidebar />
       </div>
-      <main className="p-6 space-y-8 flex-1 bg-gray-200 lg:ml-72 flex flex-col overflow-y-auto">
+      <main style={{ marginLeft: '250px', flex: 1, padding: '20px', backgroundColor: '#e5e7eb', overflowY: 'auto' }}>
         <Outlet />
       </main>
     </div>

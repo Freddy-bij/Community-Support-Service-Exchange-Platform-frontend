@@ -1,11 +1,11 @@
 import { Link } from "react-router"
-import { FiBarChart3, FiAlertCircle, FiFolderPlus, FiEdit3, FiSettings } from "react-icons/fi"
-import { ChevronRight } from "lucide-react"
-import logo from "../../images/image.png"
+import { FiBarChart3, FiAlertCircle, FiFolderPlus, FiEdit3, FiSettings, FiUsers, FiInbox } from "react-icons/fi"
 
 const AdminSidebar = () => {
   const adminItems = [
     { icon: FiBarChart3, label: "Dashboard", path: "/admin", section: "dashboard" },
+    { icon: FiUsers, label: "Users", path: "/admin/users", section: "users" },
+    { icon: FiInbox, label: "Service Requests", path: "/admin/requests", section: "requests" },
     { icon: FiAlertCircle, label: "Content Moderation", path: "/admin/moderation", section: "moderation" },
     { icon: FiEdit3, label: "Manage Posts", path: "/admin/posts", section: "posts" },
     { icon: FiFolderPlus, label: "Manage Categories", path: "/admin/categories", section: "categories" },
@@ -14,26 +14,42 @@ const AdminSidebar = () => {
 
   return (
     <>
-      <div className="flex items-center bg-gray-200 px-4 py-2.5 text-white">
-        <img src={logo} alt="Admin" className="w-12 h-12" />
-        <div className="ml-2">
-          <h1 className="text-sm font-bold text-gray-800">Admin Panel</h1>
-          <p className="text-xs text-gray-600">Control Center</p>
+      <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e5e7eb', padding: '12px 16px' }}>
+        <div style={{ width: '48px', height: '48px', backgroundColor: '#fff', borderRadius: '8px' }} />
+        <div style={{ marginLeft: '12px' }}>
+          <h1 style={{ fontSize: '14px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>Admin Panel</h1>
+          <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>Control Center</p>
         </div>
       </div>
-      <nav className="mt-8 px-4">
-        <ul className="space-y-3">
+      <nav style={{ marginTop: '32px', paddingLeft: '16px', paddingRight: '16px' }}>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {adminItems.map((item, index) => (
-            <li key={index} className="animate-slide-in" style={{ animationDelay: `${index * 100}ms` }}>
-              <Link to={item.path}>
-                <button className="group flex items-center justify-between px-4 py-4 text-sm rounded-xl transition-all duration-300 transform hover:scale-105 w-full text-left text-white hover:bg-gray-100 hover:text-[#37507E]">
-                  <div className="flex items-center">
+            <li key={index} style={{ marginBottom: '12px' }}>
+              <Link to={item.path} style={{ textDecoration: 'none' }}>
+                <button style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 16px',
+                  fontSize: '14px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  width: '100%',
+                  textAlign: 'left',
+                  color: 'white',
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     {item.icon && (
-                      <item.icon className="h-5 w-5 mr-4 transition-all duration-300 group-hover:scale-110" />
+                      <item.icon style={{ width: '20px', height: '20px' }} />
                     )}
-                    <span className="font-medium">{item.label}</span>
+                    <span style={{ fontWeight: 500 }}>{item.label}</span>
                   </div>
-                  <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </Link>
             </li>

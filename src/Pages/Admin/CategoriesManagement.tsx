@@ -33,47 +33,47 @@ const CategoriesManagement = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h1 className="text-2xl font-bold">Manage Categories</h1>
-          <p className="text-gray-500">Create and manage content categories</p>
+          <h1 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>Manage Categories</h1>
+          <p style={{ color: '#6b7280', margin: '8px 0 0 0' }}>Create and manage content categories</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-[#2C7A7B] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:opacity-90 transition"
+          style={{ backgroundColor: '#2C7A7B', color: 'white', padding: '8px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', border: 'none', cursor: 'pointer' }}
         >
           <FiPlus size={18} /> New Category
         </button>
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold mb-4">Create New Category</h2>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '24px', maxWidth: '448px', width: '100%', margin: '0 16px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>Create New Category</h2>
             <input
               type="text"
               placeholder="Category name"
               value={newCategory.name}
               onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-[#2C7A7B]"
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', marginBottom: '12px', outline: 'none' }}
             />
             <textarea
               placeholder="Category description"
               value={newCategory.description}
               onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-[#2C7A7B]"
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', marginBottom: '16px', outline: 'none', resize: 'none' }}
               rows={3}
             />
-            <div className="flex gap-2 justify-end">
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition"
+                style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '8px', backgroundColor: 'white', cursor: 'pointer' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddCategory}
-                className="px-4 py-2 bg-[#2C7A7B] text-white rounded-lg hover:opacity-90 transition"
+                style={{ padding: '8px 16px', backgroundColor: '#2C7A7B', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
               >
                 Create
               </button>
@@ -82,37 +82,37 @@ const CategoriesManagement = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
         {categories.map((category) => (
           <div
             key={category.id}
-            className="bg-white rounded-xl p-6 border hover:shadow-lg transition"
+            style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}
           >
-            <div className="flex justify-between items-start mb-3">
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">{category.name}</h3>
-                <p className="text-sm text-gray-600 mt-1">{category.description}</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ fontWeight: '600', fontSize: '18px', margin: 0 }}>{category.name}</h3>
+                <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px', margin: '8px 0 0 0' }}>{category.description}</p>
               </div>
             </div>
 
-            <div className="flex gap-4 my-4 text-sm">
+            <div style={{ display: 'flex', gap: '32px', margin: '16px 0', fontSize: '14px' }}>
               <div>
-                <p className="text-gray-500">Posts</p>
-                <p className="font-semibold">{category.posts}</p>
+                <p style={{ color: '#6b7280', margin: 0 }}>Posts</p>
+                <p style={{ fontWeight: '600', margin: '4px 0 0 0' }}>{category.posts}</p>
               </div>
               <div>
-                <p className="text-gray-500">Created</p>
-                <p className="font-semibold">{category.created}</p>
+                <p style={{ color: '#6b7280', margin: 0 }}>Created</p>
+                <p style={{ fontWeight: '600', margin: '4px 0 0 0' }}>{category.created}</p>
               </div>
             </div>
 
-            <div className="flex gap-2 pt-4 border-t">
-              <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition">
+            <div style={{ display: 'flex', gap: '8px', paddingTop: '16px', borderTop: '1px solid #e5e7eb' }}>
+              <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '8px 12px', backgroundColor: '#fed7aa', color: '#92400e', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>
                 <FiEdit2 size={16} /> Edit
               </button>
               <button
                 onClick={() => handleDelete(category.id)}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '8px 12px', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
               >
                 <FiTrash2 size={16} /> Delete
               </button>
