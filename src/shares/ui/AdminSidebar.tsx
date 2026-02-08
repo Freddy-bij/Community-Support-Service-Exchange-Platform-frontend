@@ -1,9 +1,9 @@
 import { Link } from "react-router"
-import { FiBarChart3, FiAlertCircle, FiFolderPlus, FiEdit3, FiSettings, FiUsers, FiInbox } from "react-icons/fi"
+import { FiBarChart, FiAlertCircle, FiFolderPlus, FiEdit3, FiSettings, FiUsers, FiInbox } from "react-icons/fi"
 
 const AdminSidebar = () => {
   const adminItems = [
-    { icon: FiBarChart3, label: "Dashboard", path: "/admin", section: "dashboard" },
+    { icon: FiBarChart, label: "Dashboard", path: "/admin", section: "dashboard" },
     { icon: FiUsers, label: "Users", path: "/admin/users", section: "users" },
     { icon: FiInbox, label: "Service Requests", path: "/admin/requests", section: "requests" },
     { icon: FiAlertCircle, label: "Content Moderation", path: "/admin/moderation", section: "moderation" },

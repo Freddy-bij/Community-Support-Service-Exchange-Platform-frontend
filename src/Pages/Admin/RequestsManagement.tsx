@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { FiCheckCircle, FiXCircle, FiEye } from "react-icons/fi"
+import { FiXCircle, FiEye } from "react-icons/fi"
 
 const RequestsManagement = () => {
   const [requests, setRequests] = useState([

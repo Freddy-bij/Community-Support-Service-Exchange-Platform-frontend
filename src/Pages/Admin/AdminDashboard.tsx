@@ -1,8 +1,8 @@
 const AdminDashboard = () => {
   return (
-    <div>
-      <h1 style={{ fontSize: '28px', fontWeight: 'bold' }}>Admin Dashboard</h1>
-      <p style={{ color: '#666' }}>Welcome to the admin panel</p>
+    <div style={{ padding: '20px' }}>
+      <h1>Admin Dashboard</h1>
+      <p>Welcome to the admin dashboard</p>
       
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginTop: '20px' }}>
         <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px' }}>
