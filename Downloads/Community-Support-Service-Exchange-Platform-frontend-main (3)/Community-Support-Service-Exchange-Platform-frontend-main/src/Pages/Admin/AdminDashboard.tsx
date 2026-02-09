@@ -57,14 +57,13 @@ const AdminDashboard = () => {
 
       <div className="bg-white rounded-xl p-6 flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-[#2C7A7B]"></div>
           <div>
             <p className="text-sm text-gray-500">Member since Jan 2024</p>
             <p className="font-semibold">⭐ 4.8 <span className="text-gray-400">| Level 5 Helper</span></p>
           </div>
         </div>
 
-        <button className="border px-4 py-2 rounded-lg hover:bg-gray-100">View Profile</button>
+        {/* avatar/photo and View Profile removed as requested */}
       </div>
 
       {loading ? (
@@ -81,7 +80,7 @@ const AdminDashboard = () => {
       <div className="mt-10">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Your Service Requests</h2>
-          <button className="text-[#2C7A7B] text-sm">View All</button>
+          <Link to="/admin/requests" className="text-[#2C7A7B] text-sm">View All</Link>
         </div>
 
         <div className="bg-white rounded-xl p-6 text-gray-400 text-center">No requests yet</div>
