@@ -110,7 +110,7 @@ const RecentActivity = () => {
           <p className="text-gray-600 text-sm mt-1">Latest requests and offers from your community</p>
         </div>
         <Link 
-          to="/activity"
+          to=""
           className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium shadow-sm hover:shadow-md"
         >
           View All

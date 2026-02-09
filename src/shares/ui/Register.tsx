@@ -88,7 +88,7 @@ const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }: RegisterFormProps)
           onRegisterSuccess();
         } else {
  
-          window.location.href = '/login';
+          window.location.href = '/dashboard';
         }
       }, 1500);
 
