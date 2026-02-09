@@ -56,11 +56,9 @@ const AdminDashboard = () => {
       )}
 
       <div className="bg-white rounded-xl p-6 mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500">Member since Jan 2024</p>
-            <p className="font-semibold">⭐ 4.8 <span className="text-gray-400">| Level 5 Helper</span></p>
-          </div>
+        <div>
+          <p className="text-sm text-gray-500">Member since Jan 2024</p>
+          <p className="font-semibold">⭐ 4.8 <span className="text-gray-400">| Level 5 Helper</span></p>
         </div>
       </div>
 
