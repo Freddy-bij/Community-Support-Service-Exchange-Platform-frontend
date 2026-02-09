@@ -38,7 +38,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <main className="flex-1 p-8">
+    <div className="flex-1 p-8">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -52,18 +52,16 @@ const AdminDashboard = () => {
       </div>
 
       {error && (
-        <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-4">⚠️ {error}</div>
+        <div className="bg-yellow-50 text-yellow-800 p-3 rounded-md mb-4 text-sm">{error}</div>
       )}
 
-      <div className="bg-white rounded-xl p-6 flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
+      <div className="bg-white rounded-xl p-6 mb-8">
+        <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Member since Jan 2024</p>
             <p className="font-semibold">⭐ 4.8 <span className="text-gray-400">| Level 5 Helper</span></p>
           </div>
         </div>
-
-        {/* avatar/photo and View Profile removed as requested */}
       </div>
 
       {loading ? (
@@ -85,7 +83,7 @@ const AdminDashboard = () => {
 
         <div className="bg-white rounded-xl p-6 text-gray-400 text-center">No requests yet</div>
       </div>
-    </main>
+    </div>
   )
 }
 
