@@ -55,13 +55,6 @@ const AdminDashboard = () => {
         <div className="bg-yellow-50 text-yellow-800 p-3 rounded-md mb-4 text-sm">{error}</div>
       )}
 
-      <div className="bg-white rounded-xl p-6 mb-8">
-        <div>
-          <p className="text-sm text-gray-500">Member since Jan 2024</p>
-          <p className="font-semibold">⭐ 4.8 <span className="text-gray-400">| Level 5 Helper</span></p>
-        </div>
-      </div>
-
       {loading ? (
         <div className="text-center p-10 bg-white rounded-xl">Loading dashboard stats...</div>
       ) : (
