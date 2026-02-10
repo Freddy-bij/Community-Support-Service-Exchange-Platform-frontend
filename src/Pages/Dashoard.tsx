@@ -1,20 +1,65 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StatCard from "../shares/ui/statCart";
 import { FiTrendingUp, FiMessageCircle, FiCheckCircle, FiStar, FiHome, FiMessageSquare, FiSearch, FiAward, FiSettings, FiLogOut } from "react-icons/fi";
-import { ChevronRight, Settings } from "lucide-react";
-import logo from "../images/image.png"
+import { ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import logo from "../images/image.png";
 import Message from "../shares/ui/Message";
 import BrowserRequest from "../shares/ui/BrowserRequest";
 import LearderBoard from "../shares/ui/LearderBoard";
-import { Link } from "react-router";
+import CreateOfferModal from "../shares/ui/RequestModel";
+import AuthService from "../services/AuthService";
+import RequestService from "../services/RequestService";
+import type { Request } from "../services/RequestService";
+import Responseservice from "../services/Responseservice";
 
 export default function Dashboard() {
-const [activeSection , setActiveSection] = useState("home")
+  const [activeSection, setActiveSection] = useState("home");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [myRequests, setMyRequests] = useState<Request[]>([]);
+  const [isLoadingRequests, setIsLoadingRequests] = useState(false);
+  const [totalResponses, setTotalResponses] = useState(0);
+  const [error, setError] = useState("");
+  
+  const currentUser = AuthService.getCurrentUser();
 
- const handleSidebarClick = (section:string) => {
-    setActiveSection(section)
-    
-  }
+  useEffect(() => {
+    if (activeSection === "home") {
+      fetchMyRequests();
+      fetchMyResponses();
+    }
+  }, [activeSection]);
+
+  const fetchMyRequests = async () => {
+    setIsLoadingRequests(true);
+    setError("");
+    try {
+      const response = await RequestService.getMyRequests();
+      setMyRequests(response.requests || []);
+    } catch (err: unknown) {
+      console.error("Failed to fetch requests:", err);
+      setError("Failed to load your requests. Please try again.");
+    } finally {
+      setIsLoadingRequests(false);
+    }
+  };
+
+  const fetchMyResponses = async () => {
+    try {
+      const responses = await Responseservice.getMyResponses();
+      setTotalResponses(responses.length);
+    } catch (err: unknown) {
+      console.error("Failed to fetch responses:", err);
+    }
+  };
+
+  const handleSidebarClick = (section: string) => {
+    setActiveSection(section);
+  };
+
+  const handleRequestCreated = () => {
+  
+    fetchMyRequests();
+  };
 
   const sidebarItems = [
     { 
@@ -55,7 +100,7 @@ const [activeSection , setActiveSection] = useState("home")
       section: "settings",
       active: activeSection === "settings",
     },
-     {
+    {
       icon: FiLogOut,
       label: "logout",
       hasSubmenu: true,
@@ -63,43 +108,40 @@ const [activeSection , setActiveSection] = useState("home")
       section: "logout",
       active: activeSection === "logout",
     },
-   
-  ]
+  ];
 
+  const activeRequestsCount = myRequests.filter(r => r.status === "APPROVED" && r.isActive).length;
+  const pendingRequestsCount = myRequests.filter(r => r.status === "PENDING" && r.isActive).length;
+  const completedRequestsCount = myRequests.filter(r => !r.isActive).length;
+ 
+  const totalLikes = myRequests.reduce((sum, req) => sum + req.likes, 0);
+  const averageRating = myRequests.length > 0 ? (totalLikes / myRequests.length).toFixed(1) : "0.0";
 
   const renderContent = () => {
     switch (activeSection) {
-        
-        case "settings":
+      case "settings":
+        return <div>Settings Component</div>;
+      
+      case "learderboard":
+        return <LearderBoard />;
+      
+      case "browser-request":
+        return <BrowserRequest />;
+      
+      case "messages":
         return (
-          <>
-          <Settings/>
-          </>
-        )
-        case "learderboard":
+          <div className="animate-fade-in">
+            <Message />
+          </div>
+        );
+      
+      case "logout":
         return (
-         <>
-         <LearderBoard/>
-         </>
-        )
-         case "browser-request":
-        return (
-        <>
-        <BrowserRequest/>
-        </>
-        )
-            case "messages":
-        return (
-          <div className="animate-fade-in">     
-                <Message/>
-            </div>
-        )
-        case "logout":
-        return (
-          <div className="animate-fade-in">     
-                <h1>Logout here </h1>
-            </div>
-        )
+          <div className="animate-fade-in">
+            <h1>Logout here</h1>
+          </div>
+        );
+      
       default:
         return (
           <>
@@ -107,53 +149,77 @@ const [activeSection , setActiveSection] = useState("home")
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h1 className="text-2xl font-bold">Dashboard</h1>
-                  <p className="text-gray-500">Welcome back,</p>
+                  <p className="text-gray-500">Welcome back, {currentUser?.name || "User"}!</p>
                 </div>
-               <Link to="/community-services">
-                 <button className="bg-[#2C7A7B] text-white px-4 py-2 rounded-lg hover:bg-green-700">
+               
+                <button 
+                  className="bg-[#2C7A7B] text-white px-4 py-2 rounded-lg hover:bg-green-700 transition" 
+                  onClick={() => setIsModalOpen(true)}
+                >
                   + New Request
                 </button>
-                </Link>
               </div>
 
-              <div className="bg-white rounded-xl p-6 flex justify-between items-center mb-8">
+              {isModalOpen && (
+                <CreateOfferModal 
+                  isOpen={isModalOpen} 
+                  onClose={() => setIsModalOpen(false)}
+                  onSuccess={handleRequestCreated}
+                />
+              )}
+
+           
+              {error && (
+                <div className="mb-6 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
+           
+              <div className="bg-white rounded-xl p-6 flex justify-between items-center mb-8 shadow-sm">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-[#2C7A7B]"></div>
+                  <div className="w-16 h-16 rounded-full bg-[#2C7A7B] flex items-center justify-center text-white text-2xl font-bold">
+                    {currentUser?.name?.charAt(0).toUpperCase() || "U"}
+                  </div>
                   <div>
-                    <p className="text-sm text-gray-500">Member since Jan 2024</p>
-                    <p className="font-semibold">
-                      ⭐ 4.8 <span className="text-gray-400">| Level 5 Helper</span>
+                    <h3 className="text-lg font-semibold">{currentUser?.name || "User"}</h3>
+                    <p className="text-sm text-gray-500">
+                      Member since {new Date(currentUser?.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    </p>
+                    <p className="font-semibold mt-1">
+                      ⭐ {averageRating} <span className="text-gray-400">| {currentUser?.role || "Member"}</span>
                     </p>
                   </div>
                 </div>
 
-                <button className="border px-4 py-2 rounded-lg hover:bg-gray-100">
+                <button className="border px-4 py-2 rounded-lg hover:bg-gray-100 transition">
                   View Profile
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <StatCard
                   title="Active Requests"
-                  value="0"
-                  subtitle="Open for responses"
+                  value={activeRequestsCount.toString()}
+                  subtitle={pendingRequestsCount > 0 ? `${pendingRequestsCount} pending approval` : "Approved requests"}
                   icon={<FiTrendingUp />}
                 />
                 <StatCard
                   title="Total Responses"
-                  value="12"
-                  subtitle="Received this month"
+                  value={totalResponses.toString()}
+                  subtitle="Your contributions"
                   icon={<FiMessageCircle />}
                 />
                 <StatCard
                   title="Completed"
-                  value="8"
+                  value={completedRequestsCount.toString()}
                   subtitle="Requests fulfilled"
                   icon={<FiCheckCircle />}
                 />
                 <StatCard
                   title="Rating"
-                  value="4.8"
+                  value={averageRating}
                   subtitle="Community rating"
                   icon={<FiStar />}
                 />
@@ -162,29 +228,82 @@ const [activeSection , setActiveSection] = useState("home")
               <div className="mt-10">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold">Your Service Requests</h2>
-                  <button className="text-[#2C7A7B] text-sm">View All</button>
+                  <button 
+                    className="text-[#2C7A7B] text-sm hover:underline"
+                    onClick={() => setActiveSection("browser-request")}
+                  >
+                    View All
+                  </button>
                 </div>
 
-                <div className="bg-white rounded-xl p-6 text-gray-400 text-center">
-                  No requests yet
-                </div>
+                {isLoadingRequests ? (
+                  <div className="bg-white rounded-xl p-8 flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#2C7A7B] mr-2" />
+                    <span className="text-gray-600">Loading your requests...</span>
+                  </div>
+                ) : myRequests.length === 0 ? (
+                  <div className="bg-white rounded-xl p-6 text-gray-400 text-center">
+                    No requests yet. Click "+ New Request" to create one!
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-xl divide-y">
+                    {myRequests.slice(0, 5).map((request) => (
+                      <div 
+                        key={request.id} 
+                        className="p-4 hover:bg-gray-50 transition cursor-pointer"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-gray-900">{request.title}</h3>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                request.status === "APPROVED" 
+                                  ? "bg-green-100 text-green-700"
+                                  : request.status === "PENDING"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}>
+                                {request.status}
+                              </span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                request.type === "OFFER"
+                                  ? "bg-orange-100 text-orange-700"
+                                  : "bg-blue-100 text-blue-700"
+                              }`}>
+                                {request.type}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{request.description.slice(0, 100)}...</p>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <span>📍 {request.location}</span>
+                              <span>👁 {request.views} views</span>
+                              <span>❤️ {request.likes} likes</span>
+                              <span>🕐 {new Date(request.createdAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </main>
           </>
-        )
+        );
     }
-  }
+  };
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
-      <div className="bg-[#2C7A7B] fixed inset-y-0 left-0 z-50 w-72 ">
-           <div className="flex items-center bg-gray-200 px-4 py-2.5">
-             <img src={logo} alt="" className="w-15 h-15" />
-             <div>
-                <h1>Community Support</h1>
-            <span className="text-xs">Services Exchancess Platform</span>
-             </div>
-           </div>
+      <div className="bg-[#2C7A7B] fixed inset-y-0 left-0 z-50 w-72">
+        <div className="flex items-center bg-gray-200 px-4 py-2.5">
+          <img src={logo} alt="Logo" className="w-15 h-15" />
+          <div>
+            <h1 className="font-bold">Community Support</h1>
+            <span className="text-xs">Services Exchange Platform</span>
+          </div>
+        </div>
+        
         <nav className="mt-8 px-4">
           <ul className="space-y-3">
             {sidebarItems.map((item, index) => (
@@ -198,13 +317,11 @@ const [activeSection , setActiveSection] = useState("home")
                   }`}
                 >
                   <div className="flex items-center">
-                    {item.icon && (
-                      <item.icon
-                        className={`h-5 w-5 mr-4 transition-all duration-300 ${
-                          item.active ? "animate-pulse" : "group-hover:scale-110"
-                        }`}
-                      />
-                    )}
+                    <item.icon
+                      className={`h-5 w-5 mr-4 transition-all duration-300 ${
+                        item.active ? "animate-pulse" : "group-hover:scale-110"
+                      }`}
+                    />
                     <span className="font-medium">{item.label}</span>
                   </div>
                   {item.hasSubmenu && (
@@ -216,8 +333,9 @@ const [activeSection , setActiveSection] = useState("home")
           </ul>
         </nav>
       </div>
-
-      <main className="p-6 space-y-8 flex-1 bg-gray-200  lg:ml-72  flex flex-col  overflow-y-auto">{renderContent()}</main>
+      <main className="p-6 space-y-8 flex-1 bg-gray-200 lg:ml-72 flex flex-col overflow-y-auto">
+        {renderContent()}
+      </main>
     </div>
   );
 }

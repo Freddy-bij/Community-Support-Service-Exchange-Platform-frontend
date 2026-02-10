@@ -1,4 +1,6 @@
-import api from '../config/api';
+
+
+const API_BASE_URL = 'https://community-support-flatform-backend-1.onrender.com/api';
 
 export interface RegisterData {
   name: string;
@@ -25,50 +27,93 @@ export interface AuthResponse {
   message: string;
 }
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 2): Promise<Response> {
+  let lastError: Error | null = null;
+  
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      console.log(`🔄 Attempt ${i + 1}/${maxRetries + 1}...`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+      
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      return response;
+      
+    } catch (error: any) {
+      lastError = error;
+      console.warn(`⚠️ Attempt ${i + 1} failed:`, error.message);
+ 
+      if (i === maxRetries) {
+        throw error;
+      }
+      
+      const waitTime = (i + 1) * 15000; 
+      console.log(`⏳ Waiting ${waitTime/1000}s before retry...`);
+      await sleep(waitTime);
+    }
+  }
+  
+  throw lastError || new Error('Request failed');
+}
+
 class AuthService {
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
       console.log('📤 Sending registration request:', { 
         name: data.name, 
         email: data.email,
-        url: api.defaults.baseURL + '/auth/register'
+        url: `${API_BASE_URL}/auth/register`
       });
 
-      const response = await api.post('/auth/register', data);
+      const response = await fetchWithRetry(
+        `${API_BASE_URL}/auth/register`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      const responseData = await response.json();
       
       console.log('📥 Registration response:', {
         status: response.status,
-        data: response.data
+        data: responseData
       });
 
-      if (response.data.token) {
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (!response.ok) {
+        throw new Error(responseData.message || responseData.error || 'Registration failed');
+      }
+
+      if (responseData.token) {
+        localStorage.setItem('authToken', responseData.token);
+        localStorage.setItem('user', JSON.stringify(responseData.user));
         console.log('✅ Token saved to localStorage');
       }
       
-      return response.data;
+      return responseData;
     } catch (error: any) {
-      console.error('❌ Registration error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        url: error.config?.url,
-        method: error.config?.method,
-        fullError: error
-      });
-
-     
-      if (error.response?.data) {
-        throw error.response.data;
-      } else if (error.request) {
-        throw { 
-          error: 'Cannot connect to server. Please check if the backend is running and CORS is configured.' 
-        };
-      } else {
-        throw { error: error.message || 'Registration failed' };
+      console.error('❌ Registration error details:', error);
+      
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out. The server might be starting up. Please try again in 30 seconds.');
       }
+      
+      if (error.message === 'Failed to fetch' || error.message?.includes('NetworkError')) {
+        throw new Error('Cannot connect to server. It might be waking up (Render free tier). Please wait 30 seconds and try again.');
+      }
+      
+      throw error;
     }
   }
 
@@ -76,45 +121,64 @@ class AuthService {
     try {
       console.log('📤 Sending login request:', { 
         email: data.email,
-        url: api.defaults.baseURL + '/auth/login'
+        url: `${API_BASE_URL}/auth/login`
       });
 
-      const response = await api.post('/auth/login', data);
+      const response = await fetchWithRetry(
+        `${API_BASE_URL}/auth/login`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      const responseData = await response.json();
       
       console.log('📥 Login response:', {
         status: response.status,
-        data: response.data
+        data: responseData
       });
 
-      if (response.data.token) {
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (!response.ok) {
+        throw new Error(responseData.message || responseData.error || 'Login failed');
+      }
+
+      if (responseData.token) {
+        localStorage.setItem('authToken', responseData.token);
+        localStorage.setItem('user', JSON.stringify(responseData.user));
         console.log('✅ Token saved to localStorage');
       }
       
-      return response.data;
+      return responseData;
     } catch (error: any) {
-      console.error('❌ Login error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        fullError: error
-      });
+      console.error('❌ Login error details:', error);
 
-      if (error.response?.data) {
-        throw error.response.data;
-      } else if (error.request) {
-        throw { error: 'Cannot connect to server. Please check your connection.' };
-      } else {
-        throw { error: error.message || 'Login failed' };
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out. Please try again.');
       }
+
+      if (error.message === 'Failed to fetch' || error.message?.includes('NetworkError')) {
+        throw new Error('Cannot connect to server. Please check your connection or try again in a moment.');
+      }
+      
+      throw error;
     }
   }
 
   async logout(): Promise<void> {
     try {
-      await api.post('/auth/logout');
+      const token = this.getToken();
+      
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -125,20 +189,26 @@ class AuthService {
 
   async getProfile() {
     try {
-      const response = await api.get('/auth/profile');
-      return response.data;
-    } catch (error: any) {
-      console.error('❌ Get profile error:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
+      const token = this.getToken();
+      
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
       });
 
-      if (error.response?.data) {
-        throw error.response.data;
-      } else {
-        throw { error: 'Failed to fetch profile' };
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Failed to fetch profile');
       }
+
+      return data;
+    } catch (error: any) {
+      console.error('❌ Get profile error:', error);
+      throw error;
     }
   }
 
