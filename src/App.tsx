@@ -1,4 +1,3 @@
-
 import {  Route, Routes } from "react-router"
 import Home from "./Pages/Home"
 import Auth from "./Pages/Auth"
@@ -17,8 +16,7 @@ import AdminSettings from "./Pages/Admin/AdminSettings"
 
 const App = () => {
   return (
-    <>
-    
+    <>   
     <Routes>
       <Route path="/admin" element={<AdminLayout/>}>
         <Route index element={<AdminDashboard/>} />
@@ -33,12 +31,9 @@ const App = () => {
       <Route  element={<Layout/>} >
       <Route path="/" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
-       <Route path="community-services" element={<CommunityServicePlatform/>}/>
+       <Route path="community-servicess" element={<CommunityServicePlatform/>}/>
       </Route>
     </Routes>
-    
-  
-    
     </>
   )
 }

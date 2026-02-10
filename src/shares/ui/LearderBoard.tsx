@@ -27,7 +27,6 @@ interface LeaderboardEntry {
     communityRating: 4.71,
   }
 const LearderBoard = () => {
-  // FIXED: Defined as constants to avoid "unused setter" errors
   return (
     <div className="min-h-screen bg-background">
       <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-12">
