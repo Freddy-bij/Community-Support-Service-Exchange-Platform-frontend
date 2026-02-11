@@ -27,32 +27,27 @@ const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }: RegisterFormProps)
   };
 
   const validateForm = (): boolean => {
-  
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all fields');
       return false;
     }
-
 
     if (formData.name.trim().length < 2) {
       setError('Name must be at least 2 characters');
       return false;
     }
 
-    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
       return false;
     }
 
-    // Password validation
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters');
       return false;
     }
 
-    // Password match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return false;
@@ -63,7 +58,6 @@ const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }: RegisterFormProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -81,20 +75,23 @@ const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }: RegisterFormProps)
 
       console.log('✅ Registration successful:', response);
       setSuccess(response.message || 'Account created successfully!');
-
       
       setTimeout(() => {
         if (onRegisterSuccess) {
           onRegisterSuccess();
         } else {
- 
           window.location.href = '/dashboard';
         }
       }, 1500);
 
     } catch (err: any) {
       console.error('❌ Registration error:', err);
-      setError(err.error || 'Registration failed. Please try again.');
+      
+      if (err.message === 'Failed to fetch') {
+        setError("Network error: The server might still be waking up. Please wait 20 seconds and try again.");
+      } else {
+        setError(err.message || "An unexpected error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +100,6 @@ const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }: RegisterFormProps)
   return (
     <div>
       <form className="space-y-3" onSubmit={handleSubmit}>
-       
         {error && (
           <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -111,7 +107,6 @@ const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }: RegisterFormProps)
           </div>
         )}
 
-      
         {success && (
           <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />

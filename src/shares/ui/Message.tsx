@@ -80,7 +80,7 @@ const MessagePage = () => {
                 <ConversationItem
                   key={conv.id}
                   conversation={conv}
-                  // FIXED: Optional chaining (?.) handles the null state safely
+                
                   isActive={selectedConversation?.id === conv.id}
                   onClick={() => setSelectedConversation(conv)}
                 />

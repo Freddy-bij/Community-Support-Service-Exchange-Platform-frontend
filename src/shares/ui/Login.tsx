@@ -23,7 +23,6 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }: LoginFormProps) => {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing again
     if (error) setError('');
   };
 
@@ -65,7 +64,13 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }: LoginFormProps) => {
       }, 1000);
 
     } catch (err: any) {
-      setError(err.error || 'Login failed. Please try again.');
+      console.error('❌ Login error:', err);
+      
+      if (err.message === 'Failed to fetch') {
+        setError('Cannot connect to server. Please check your connection.');
+      } else {
+        setError(err.message || 'Login failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -135,9 +140,16 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }: LoginFormProps) => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium py-2.5 rounded-lg transition text-sm flex items-center justify-center gap-2"
+          className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium py-2.5 rounded-lg transition text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Log in'}
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Logging in...
+            </>
+          ) : (
+            'Log in'
+          )}
         </button>
 
         {onSwitchToRegister && (

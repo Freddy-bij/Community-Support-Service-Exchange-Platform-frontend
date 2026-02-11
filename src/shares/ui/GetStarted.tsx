@@ -120,8 +120,10 @@ const GettingStarted = () => {
             )
           ))}
         </div>
+      
+
       </div>
-      <CreateOfferModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+<CreateOfferModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   )
 }
