@@ -109,11 +109,11 @@ export const deleteRequest = async (requestId: string) => {
 };
 
 export const approveRequest = async (requestId: string) => {
-  return apiCall(`/requests/${requestId}/approve`, "POST");
+  return apiCall(`/requests/approve`, "PATCH", { requestId });
 };
 
 export const rejectRequest = async (requestId: string, reason?: string) => {
-  return apiCall(`/requests/${requestId}/reject`, "POST", { reason });
+  return apiCall(`/requests/reject`, "PATCH", { requestId, reason });
 };
 
 // ==================== CATEGORIES API ====================

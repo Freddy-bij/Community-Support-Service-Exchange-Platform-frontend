@@ -13,6 +13,7 @@ const BrowserRequest = () => {
   
   const [selectedType, setSelectedType] = useState<"ALL" | "REQUEST" | "OFFER">("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [selectedStatus, setSelectedStatus] = useState<"ALL" | "APPROVED">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   
   const [isLoading, setIsLoading] = useState(false);
@@ -33,13 +34,16 @@ const BrowserRequest = () => {
   const filterRequests = useCallback(() => {
     let filtered = [...requests];
 
-    
     if (selectedType !== "ALL") {
       filtered = filtered.filter(req => req.type === selectedType);
     }
 
     if (selectedCategory !== "ALL") {
       filtered = filtered.filter(req => req.categoryId === selectedCategory);
+    }
+
+    if (selectedStatus !== "ALL") {
+      filtered = filtered.filter(req => req.status === selectedStatus);
     }
 
     if (searchQuery.trim()) {
@@ -52,7 +56,7 @@ const BrowserRequest = () => {
     }
 
     setFilteredRequests(filtered);
-  }, [requests, selectedType, selectedCategory, searchQuery]);
+  }, [requests, selectedType, selectedCategory, selectedStatus, searchQuery]);
 
   useEffect(() => {
     filterRequests();
@@ -71,12 +75,15 @@ const BrowserRequest = () => {
     setIsLoading(true);
     setError("");
     try {
+      console.log('Fetching all requests...');
       const [requestsData, offersData] = await Promise.all([
-        RequestService.getApprovedRequests("REQUEST"),
-        RequestService.getApprovedRequests("OFFER"),
+        RequestService.getAllRequests("REQUEST"),
+        RequestService.getAllRequests("OFFER"),
       ]);
       
+      console.log('Requests fetched:', requestsData.length, 'requests,', offersData.length, 'offers');
       const allRequests = [...requestsData, ...offersData];
+      console.log('Total requests:', allRequests);
       setRequests(allRequests);
     } catch (err: unknown) {
       console.error("Failed to fetch requests:", err);
@@ -112,13 +119,13 @@ const BrowserRequest = () => {
 
     setIsSubmittingResponse(true);
     try {
-      await Responseservice.createResponse({
+      const newResponse = await Responseservice.createResponse({
         requestId: selectedRequest.id,
         content: responseContent.trim(),
       });
      
-      const updatedResponses = await Responseservice.getResponsesByRequest(selectedRequest.id);
-      setResponses(updatedResponses);
+      // Add the new response to the list immediately
+      setResponses([...responses, newResponse]);
       setResponseContent("");
       alert("Response submitted successfully!");
     } catch (err: unknown) {
@@ -145,7 +152,7 @@ const BrowserRequest = () => {
 
    
       <div className="bg-white rounded-xl p-4 shadow-sm space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
        
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -182,6 +189,15 @@ const BrowserRequest = () => {
               </option>
             ))}
           </select>
+
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value as "ALL" | "APPROVED")}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+          >
+            <option value="ALL">All Approved</option>
+            <option value="APPROVED">Approved Only</option>
+          </select>
         </div>
 
         <div className="text-sm text-gray-600">
@@ -214,13 +230,24 @@ const BrowserRequest = () => {
               onClick={() => handleViewRequest(request)}
             >
               <div className="flex items-start justify-between mb-3">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  request.type === "OFFER"
-                    ? "bg-orange-100 text-orange-700"
-                    : "bg-blue-100 text-blue-700"
-                }`}>
-                  {request.type}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    request.type === "OFFER"
+                      ? "bg-orange-100 text-orange-700"
+                      : "bg-blue-100 text-blue-700"
+                  }`}>
+                    {request.type}
+                  </span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    request.status === "APPROVED"
+                      ? "bg-green-100 text-green-700"
+                      : request.status === "PENDING"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-red-100 text-red-700"
+                  }`}>
+                    {request.status}
+                  </span>
+                </div>
                 <span className="text-xs text-gray-500">{getCategoryName(request.categoryId)}</span>
               </div>
 

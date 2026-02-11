@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import StatCard from "../shares/ui/statCart";
-import { FiTrendingUp, FiMessageCircle, FiCheckCircle, FiStar, FiHome, FiMessageSquare, FiSearch, FiAward, FiSettings, FiLogOut } from "react-icons/fi";
+import { FiTrendingUp, FiMessageCircle, FiCheckCircle, FiStar, FiHome, FiMessageSquare, FiSearch, FiAward, FiSettings, FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import logo from "../images/image.png";
 import Message from "../shares/ui/Message";
@@ -19,6 +19,8 @@ export default function Dashboard() {
   const [isLoadingRequests, setIsLoadingRequests] = useState(false);
   const [totalResponses, setTotalResponses] = useState(0);
   const [error, setError] = useState("");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   const currentUser = AuthService.getCurrentUser();
 
@@ -53,7 +55,17 @@ export default function Dashboard() {
   };
 
   const handleSidebarClick = (section: string) => {
-    setActiveSection(section);
+    if (section === "logout") {
+      setShowLogoutModal(true);
+    } else {
+      setActiveSection(section);
+    }
+    setIsSidebarOpen(false);
+  };
+
+  const handleLogout = async () => {
+    await AuthService.logout();
+    window.location.href = "/auth";
   };
 
   const handleRequestCreated = () => {
@@ -146,14 +158,14 @@ export default function Dashboard() {
         return (
           <>
             <main className="flex-1 p-8">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
-                  <h1 className="text-2xl font-bold">Dashboard</h1>
-                  <p className="text-gray-500">Welcome back, {currentUser?.name || "User"}!</p>
+                  <h1 className="text-xl md:text-2xl font-bold">Dashboard</h1>
+                  <p className="text-sm md:text-base text-gray-500">Welcome back, {currentUser?.name || "User"}!</p>
                 </div>
                
                 <button 
-                  className="bg-[#2C7A7B] text-white px-4 py-2 rounded-lg hover:bg-green-700 transition" 
+                  className="bg-[#2C7A7B] text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full sm:w-auto" 
                   onClick={() => setIsModalOpen(true)}
                 >
                   + New Request
@@ -177,28 +189,28 @@ export default function Dashboard() {
               )}
 
            
-              <div className="bg-white rounded-xl p-6 flex justify-between items-center mb-8 shadow-sm">
+              <div className="bg-white rounded-xl p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 shadow-sm">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-[#2C7A7B] flex items-center justify-center text-white text-2xl font-bold">
+                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#2C7A7B] flex items-center justify-center text-white text-xl md:text-2xl font-bold">
                     {currentUser?.name?.charAt(0).toUpperCase() || "U"}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold">{currentUser?.name || "User"}</h3>
-                    <p className="text-sm text-gray-500">
+                    <h3 className="text-base md:text-lg font-semibold">{currentUser?.name || "User"}</h3>
+                    <p className="text-xs md:text-sm text-gray-500">
                       Member since {new Date(currentUser?.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                     </p>
-                    <p className="font-semibold mt-1">
+                    <p className="font-semibold mt-1 text-sm md:text-base">
                       ⭐ {averageRating} <span className="text-gray-400">| {currentUser?.role || "Member"}</span>
                     </p>
                   </div>
                 </div>
 
-                <button className="border px-4 py-2 rounded-lg hover:bg-gray-100 transition">
+                <button className="border px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm w-full sm:w-auto">
                   View Profile
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
                 <StatCard
                   title="Active Requests"
                   value={activeRequestsCount.toString()}
@@ -295,11 +307,30 @@ export default function Dashboard() {
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
-      <div className="bg-[#2C7A7B] fixed inset-y-0 left-0 z-50 w-72">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-[#2C7A7B] text-white rounded-lg shadow-lg"
+      >
+        {isSidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+      </button>
+
+      {/* Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`bg-[#2C7A7B] fixed inset-y-0 left-0 z-50 w-64 lg:w-72 transform transition-transform duration-300 ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      } md:translate-x-0`}>
         <div className="flex items-center bg-gray-200 px-4 py-2.5">
-          <img src={logo} alt="Logo" className="w-15 h-15" />
-          <div>
-            <h1 className="font-bold">Community Support</h1>
+          <img src={logo} alt="Logo" className="w-12 h-12" />
+          <div className="ml-2">
+            <h1 className="font-bold text-sm lg:text-base">Community Support</h1>
             <span className="text-xs">Services Exchange Platform</span>
           </div>
         </div>
@@ -310,7 +341,7 @@ export default function Dashboard() {
               <li key={index} className="animate-slide-in" style={{ animationDelay: `${index * 100}ms` }}>
                 <button
                   onClick={() => handleSidebarClick(item.section)}
-                  className={`group flex items-center justify-between px-4 py-4 text-sm rounded-xl transition-all duration-300 transform hover:scale-105 w-full text-left ${
+                  className={`group flex items-center justify-between px-4 py-3 text-sm rounded-xl transition-all duration-300 transform hover:scale-105 w-full text-left ${
                     item.active
                       ? "bg-gray-100 text-[#37507E] shadow-lg"
                       : "text-white hover:bg-gray-100 hover:text-[#37507E]"
@@ -318,7 +349,7 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center">
                     <item.icon
-                      className={`h-5 w-5 mr-4 transition-all duration-300 ${
+                      className={`h-5 w-5 mr-3 transition-all duration-300 ${
                         item.active ? "animate-pulse" : "group-hover:scale-110"
                       }`}
                     />
@@ -333,9 +364,33 @@ export default function Dashboard() {
           </ul>
         </nav>
       </div>
-      <main className="p-6 space-y-8 flex-1 bg-gray-200 lg:ml-72 flex flex-col overflow-y-auto">
+      <main className="p-4 md:p-6 lg:p-8 space-y-8 flex-1 bg-gray-200 md:ml-64 lg:ml-72 flex flex-col overflow-y-auto">
         {renderContent()}
       </main>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h2 className="text-xl font-bold mb-4">Confirm Logout</h2>
+            <p className="text-gray-600 mb-6">Are you sure you want to logout?</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
