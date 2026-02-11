@@ -1,8 +1,9 @@
+
 import { useEffect, useState } from "react"
 import { getAnalytics } from "../../services/api"
 import StatCard from "../../shares/ui/statCart"
-import { FiUsers, FiClock, FiCheckCircle, FiGrid, FiHome, FiFileText, FiSettings, FiLogOut, FiMenu, FiX } from "react-icons/fi"
-import { Loader2, AlertCircle, ChevronRight } from "lucide-react"
+import { FiUsers, FiClock, FiCheckCircle, FiGrid, FiHome, FiFileText, FiSettings, FiLogOut, FiMenu, FiX, FiSearch, FiBell, FiChevronDown } from "react-icons/fi"
+import { Loader2, AlertCircle, } from "lucide-react"
 import logo from "../../images/image.png"
 import AuthService from "../../services/AuthService"
 import { SiAbusedotch } from "react-icons/si"
@@ -26,13 +27,11 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchStats()
-    console.log('Current admin user:', currentUser)
   }, [])
 
   const fetchStats = async () => {
     try {
       setLoading(true)
-      setError("")
       const data = await getAnalytics()
       setStats({
         totalUsers: data.totalUsers || 0,
@@ -41,174 +40,168 @@ const AdminDashboard = () => {
         totalCategories: data.totalCategories || 0,
       })
     } catch (err: any) {
-      console.error("Error fetching stats:", err)
-      // Don't show error, just use default values
-      setStats({
-        totalUsers: 0,
-        pendingRequests: 0,
-        totalRequests: 0,
-        totalCategories: 0,
-      })
+      setError("Failed to fetch dashboard statistics.")
     } finally {
       setLoading(false)
     }
   }
 
   const sidebarItems = [
-    { icon: FiHome, label: "Dashboard", active: activeSection === "home", section: "home", hasSubmenu: true },
-    { icon: FiUsers, label: "Users", section: "users", active: activeSection === "users", hasSubmenu: true },
-    { icon: FiFileText, label: "Requests", section: "requests", active: activeSection === "requests", hasSubmenu: true },
-    { icon: FiGrid, label: "Categories", section: "categories", active: activeSection === "categories", hasSubmenu: true },
-    { icon: SiAbusedotch, label: "Abuse Reports", section: "abuse-reports", active: activeSection === "abuse-reports", hasSubmenu: true },
-    { icon: GrAnalytics, label: "Analytics", section: "analytics", active: activeSection === "analytics", hasSubmenu: true },
-    { icon: FiSettings, label: "Settings", section: "settings", active: activeSection === "settings", hasSubmenu: true },
-    { icon: FiLogOut, label: "Logout", section: "logout", active: activeSection === "logout", hasSubmenu: true },
+    { icon: FiHome, label: "Dashboard", section: "home" },
+    { icon: FiUsers, label: "Users", section: "users" },
+    { icon: FiFileText, label: "Requests", section: "requests" },
+    { icon: FiGrid, label: "Categories", section: "categories" },
+    { icon: SiAbusedotch, label: "Abuse Reports", section: "abuse-reports" },
+    { icon: GrAnalytics, label: "Analytics", section: "analytics" },
+    { icon: FiSettings, label: "Settings", section: "settings" },
+    { icon: FiLogOut, label: "Logout", section: "logout" },
   ]
 
   return (
-    <div className="flex bg-gray-50 min-h-screen">
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-[#2C7A7B] text-white rounded-lg shadow-lg"
+  
+    <div className="fixed inset-0 flex bg-[#F8FAFC] overflow-hidden z-[9999]">
+      
+      <aside
+        className={`fixed inset-y-0 left-0 z-[100] w-64 lg:w-72 bg-[#2C7A7B] shadow-2xl transform transition-transform duration-300 ease-in-out 
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+          md:translate-x-0`}
       >
-        {isSidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-      </button>
-
-      {/* Overlay */}
-      {isSidebarOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`bg-[#2C7A7B] fixed inset-y-0 left-0 z-50 w-64 lg:w-72 transform transition-transform duration-300 ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } md:translate-x-0`}>
-        <div className="flex items-center bg-gray-200 px-4 py-2.5">
-          <img src={logo} alt="Logo" className="w-12 h-12" />
-          <div className="ml-2">
-            <h1 className="font-bold text-sm lg:text-base">Admin Panel</h1>
-            <span className="text-xs">Community Support</span>
+        <div className="flex items-center justify-between bg-black/10 px-6 py-6 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="bg-white p-1.5 rounded-xl shadow-sm">
+                <img src={logo} alt="Logo" className="w-8 h-8 object-contain" />
+            </div>
+            <div className="text-white">
+              <h1 className="font-bold text-base tracking-tight">AdminPanel</h1>
+              <p className="text-[10px] opacity-60 uppercase font-semibold">Control Center</p>
+            </div>
           </div>
+          <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-white p-1 hover:bg-white/10 rounded-lg">
+            <FiX size={24} />
+          </button>
         </div>
         
-        <nav className="mt-8 px-4">
-          <ul className="space-y-3">
-            {sidebarItems.map((item, index) => (
-              <li key={index} className="animate-slide-in" style={{ animationDelay: `${index * 100}ms` }}>
+        <nav className="mt-6 px-4 overflow-y-auto h-[calc(100vh-100px)] custom-scrollbar">
+          <ul className="space-y-1">
+            {sidebarItems.map((item) => (
+              <li key={item.section}>
                 <button
                   onClick={() => {
                     setActiveSection(item.section)
-                    setIsSidebarOpen(false)
+                    if (window.innerWidth < 768) setIsSidebarOpen(false)
                   }}
-                  className={`group flex items-center justify-between px-4 py-3 text-sm rounded-xl transition-all duration-300 transform hover:scale-105 w-full text-left ${
-                    item.active
-                      ? "bg-gray-100 text-[#37507E] shadow-lg"
-                      : "text-white hover:bg-gray-100 hover:text-[#37507E]"
-                  }`}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 text-sm rounded-xl transition-all duration-200 group
+                    ${activeSection === item.section
+                      ? "bg-white text-[#2C7A7B] font-bold shadow-lg shadow-black/5"
+                      : "text-white/70 hover:bg-white/10 hover:text-white"
+                    }`}
                 >
-                  <div className="flex items-center">
-                    <item.icon
-                      className={`h-5 w-5 mr-3 transition-all duration-300 ${
-                        item.active ? "animate-pulse" : "group-hover:scale-110"
-                      }`}
-                    />
-                    <span className="font-medium">{item.label}</span>
+                  <div className="flex items-center gap-3">
+                    <item.icon className={`h-5 w-5 ${activeSection === item.section ? "" : "group-hover:scale-110 transition-transform"}`} />
+                    <span>{item.label}</span>
                   </div>
-                  {item.hasSubmenu && (
-                    <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  )}
+                  {activeSection === item.section && <div className="w-1.5 h-1.5 rounded-full bg-[#2C7A7B]" />}
                 </button>
               </li>
             ))}
           </ul>
         </nav>
+      </aside>
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        
+        <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 shrink-0">
+          <div className="flex items-center gap-4">
+            <button 
+                onClick={() => setIsSidebarOpen(true)} 
+                className="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <FiMenu size={22} />
+            </button>
+            <div className="hidden sm:flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 group focus-within:ring-2 focus-within:ring-[#2C7A7B]/20 transition-all">
+                <FiSearch className="text-gray-400 group-focus-within:text-[#2C7A7B]" />
+                <input type="text" placeholder="Search data..." className="bg-transparent border-none outline-none text-sm w-48 lg:w-64" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 md:gap-6">
+            <button className="relative p-2.5 text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">
+                <FiBell size={20} />
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
+            
+            <div className="h-8 w-[1px] bg-gray-100 hidden sm:block" />
+
+            <div className="flex items-center gap-3 pl-2 group cursor-pointer">
+                <div className="text-right hidden sm:block">
+                    <p className="text-sm font-bold text-gray-800 leading-none">{currentUser?.name || "Admin"}</p>
+                    <p className="text-[10px] text-gray-400 font-semibold uppercase mt-1">{currentUser?.role || "Manager"}</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C7A7B] to-[#37507E] flex items-center justify-center text-white font-bold shadow-md group-hover:shadow-lg transition-all">
+                    {currentUser?.name?.charAt(0).toUpperCase() || "A"}
+                </div>
+                <FiChevronDown className="text-gray-400 group-hover:text-gray-600 transition-colors" />
+            </div>
+          </div>
+        </header>
+
+        <div className="flex-1 flex flex-row overflow-hidden">
+           
+           <div className="hidden md:block md:w-64 lg:w-72 shrink-0 h-full" />
+
+           <main className="flex-1 h-full overflow-y-auto p-4 md:p-8 lg:p-10">
+              <div className="max-w-7xl mx-auto w-full pb-10">
+                  {activeSection === "requests" ? (
+                    <RequestsManagement />
+                  ) : activeSection === "categories" ? (
+                    <CategoriesManagement />
+                  ) : (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                      
+                      <div>
+                        <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">Dashboard Overview</h1>
+                        <p className="text-gray-500 mt-1">Real-time analytics and platform management.</p>
+                      </div>
+
+                      {error && (
+                        <div className="flex items-center gap-3 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl text-red-700">
+                          <AlertCircle size={20} />
+                          <p className="text-sm font-semibold">{error}</p>
+                        </div>
+                      )}
+
+                      {loading ? (
+                        <div className="h-64 flex flex-col items-center justify-center bg-white rounded-3xl border border-dashed border-gray-200">
+                          <Loader2 className="w-10 h-10 animate-spin text-[#2C7A7B] mb-3" />
+                          <span className="text-gray-400 font-medium">Loading platform stats...</span>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                          <StatCard title="Total Users" value={stats.totalUsers} icon={<FiUsers />} />
+                          <StatCard title="Pending Items" value={stats.pendingRequests} icon={<FiClock />} />
+                          <StatCard title="All Requests" value={stats.totalRequests} icon={<FiCheckCircle />} />
+                          <StatCard title="Categories" value={stats.totalCategories} icon={<FiGrid />} />
+                        </div>
+                      )}
+
+                      <div className="bg-[#37507E] rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-blue-900/10">
+                          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div>
+                                <h2 className="text-2xl font-bold">System Integrity Check</h2>
+                                <p className="text-blue-100/70 mt-1">All systems are currently operational. No critical issues found.</p>
+                            </div>
+                            <button className="bg-white text-[#37507E] font-bold px-6 py-3 rounded-2xl hover:bg-blue-50 transition-colors shadow-lg active:scale-95">
+                                Generate System Report
+                            </button>
+                          </div>
+                          <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-white/5 rounded-full" />
+                      </div>
+
+                    </div>
+                  )}
+              </div>
+           </main>
+        </div>
       </div>
-      <main className="flex-1 bg-gray-50 w-full min-h-screen overflow-x-hidden">
-        {activeSection === "requests" ? (
-          <div className="w-full">
-            <RequestsManagement />
-          </div>
-        ) : activeSection === "categories" ? (
-          <div className="w-full">
-            <CategoriesManagement />
-          </div>
-        ) : (
-          <div className="p-4 md:p-6 lg:p-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <div>
-                <h1 className="text-xl md:text-2xl font-bold">Admin Dashboard</h1>
-                <p className="text-sm md:text-base text-gray-500">Welcome back, {currentUser?.name || "Admin"}!</p>
-              </div>
-            </div>
-
-            {error && (
-              <div className="mb-6 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            )}
-
-            {/* Admin Profile Card */}
-            <div className="bg-white rounded-xl p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#2C7A7B] flex items-center justify-center text-white text-xl md:text-2xl font-bold">
-                  {currentUser?.name?.charAt(0).toUpperCase() || "A"}
-                </div>
-                <div>
-                  <h3 className="text-base md:text-lg font-semibold">{currentUser?.name || "Administrator"}</h3>
-                  <p className="text-xs md:text-sm text-gray-500">
-                    Admin since {new Date(currentUser?.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                  </p>
-                  <p className="font-semibold mt-1 text-sm md:text-base">
-                    <span className="text-gray-400">Role: {currentUser?.role || "ADMIN"}</span>
-                  </p>
-                </div>
-              </div>
-              <button className="border px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm w-full sm:w-auto">
-                View Profile
-              </button>
-            </div>
-
-            {loading ? (
-              <div className="bg-white rounded-xl p-8 flex items-center justify-center">
-                <Loader2 className="w-6 h-6 animate-spin text-[#2C7A7B] mr-2" />
-                <span className="text-gray-600">Loading dashboard stats...</span>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-                <StatCard
-                  title="Total Users"
-                  value={stats.totalUsers.toString()}
-                  subtitle="Registered users"
-                  icon={<FiUsers />}
-                />
-                <StatCard
-                  title="Pending Requests"
-                  value={stats.pendingRequests.toString()}
-                  subtitle="Awaiting approval"
-                  icon={<FiClock />}
-                />
-                <StatCard
-                  title="Total Requests"
-                  value={stats.totalRequests.toString()}
-                  subtitle="All requests"
-                  icon={<FiCheckCircle />}
-                />
-                <StatCard
-                  title="Categories"
-                  value={stats.totalCategories.toString()}
-                  subtitle="Service categories"
-                  icon={<FiGrid />}
-                />
-              </div>
-            )}
-          </div>
-        )}
-      </main>
     </div>
   )
 }

@@ -1,21 +1,85 @@
-import Logo from "../ui/logo"
-import Search from "../ui/search"
-import { Link } from "react-router"
+
+import { useState, useEffect } from "react";
+import Logo from "../ui/logo";
+import Search from "../ui/search";
+import { Link } from "react-router";
+import { HiMenuAlt3, HiX } from "react-icons/hi";
 
 const NavBar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="bg-gray-100 fixed z-100 w-full">
-        <div className="w-[90%] mx-auto flex justify-between items-center py-3">
-            <Logo/> 
-            <div className="flex items-center gap-4">
-              <Search/>
+    <>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/95 backdrop-blur-md shadow-lg"
+            : "bg-white shadow-sm"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+          
+            <div className="flex-shrink-0">
+              <Logo />
+            </div>
+
+            <div className="hidden md:flex items-center gap-4">
+              <Search />
               <Link to="/admin">
-                <button className="bg-[#2C7A7B] text-white px-3 py-1 rounded-md text-sm">Admin</button>
+                <button className="relative overflow-hidden group bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-0.5">
+                  <span className="relative z-10">Admin Dashboard</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#3a9a9c] to-[#2C7A7B] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
               </Link>
             </div>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <HiX className="w-6 h-6 text-[#2C7A7B]" />
+              ) : (
+                <HiMenuAlt3 className="w-6 h-6 text-[#2C7A7B]" />
+              )}
+            </button>
+          </div>
         </div>
-    </div>
-  )
-}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="px-4 pb-6 pt-2 bg-gray-50 border-t border-gray-200">
+            <div className="flex flex-col gap-4">
+              <Search />
+              <Link
+                to="/admin"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full"
+              >
+                <button className="w-full bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors duration-300 shadow-md">
+                  Admin Dashboard
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-export default NavBar
+      <div className="h-20"></div>
+    </>
+  );
+};
+
+export default NavBar;
