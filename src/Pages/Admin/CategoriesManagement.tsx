@@ -21,8 +21,11 @@ const CategoriesManagement = () => {
     try {
       setLoading(true)
       setError("")
-      const data = await getCategories()
-      setCategories(Array.isArray(data) ? data : data.data || [])
+      const response = await getCategories()
+      console.log('Categories response:', response)
+      const categoriesData = response.categories || response || []
+      console.log('Categories data:', categoriesData)
+      setCategories(categoriesData)
     } catch (err: any) {
       setError(err.message || "Failed to load categories")
       console.error("Error fetching categories:", err)
@@ -45,7 +48,7 @@ const CategoriesManagement = () => {
         description: newCategory.description,
         isActive: true,
       })
-      setCategories([...categories, createdCategory])
+      fetchCategories()
       setNewCategory({ name: "", description: "" })
       setShowModal(false)
     } catch (err: any) {
@@ -60,7 +63,7 @@ const CategoriesManagement = () => {
       try {
         setActionLoading(categoryId)
         await deleteCategory(categoryId)
-        setCategories(categories.filter(cat => cat._id !== categoryId))
+        fetchCategories()
       } catch (err: any) {
         setError(err.message || "Failed to delete category")
       } finally {
@@ -143,7 +146,7 @@ const CategoriesManagement = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
           {categories.map((category) => (
             <div
-              key={category._id}
+              key={category.id}
               style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
@@ -168,15 +171,15 @@ const CategoriesManagement = () => {
 
               <div style={{ display: 'flex', gap: '8px', paddingTop: '16px', borderTop: '1px solid #e5e7eb' }}>
                 <button 
-                  disabled={actionLoading === category._id}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '8px 12px', backgroundColor: '#fed7aa', color: '#92400e', borderRadius: '8px', border: 'none', cursor: 'pointer', opacity: actionLoading === category._id ? 0.6 : 1 }}
+                  disabled={actionLoading === category.id}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '8px 12px', backgroundColor: '#fed7aa', color: '#92400e', borderRadius: '8px', border: 'none', cursor: 'pointer', opacity: actionLoading === category.id ? 0.6 : 1 }}
                 >
                   <FiEdit2 size={16} /> Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(category._id)}
-                  disabled={actionLoading === category._id}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '8px 12px', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '8px', border: 'none', cursor: 'pointer', opacity: actionLoading === category._id ? 0.6 : 1 }}
+                  onClick={() => handleDelete(category.id)}
+                  disabled={actionLoading === category.id}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '8px 12px', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '8px', border: 'none', cursor: 'pointer', opacity: actionLoading === category.id ? 0.6 : 1 }}
                 >
                   <FiTrash2 size={16} /> Delete
                 </button>

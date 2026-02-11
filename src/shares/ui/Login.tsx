@@ -53,15 +53,22 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }: LoginFormProps) => {
         password: formData.password,
       });
 
+      console.log('Login response:', response);
+      console.log('User role:', response.user?.role);
+
       setSuccess(response.message || 'Login successful!');
       
-      setTimeout(() => {
-        if (onLoginSuccess) {
-          onLoginSuccess();
-        } else {
-          window.location.href = '/dashboard';
-        }
-      }, 1000);
+      // Redirect based on user role
+      const user = response.user;
+      console.log('Redirecting user with role:', user.role);
+      
+      if (user.role === 'admin') {
+        console.log('Redirecting to /admin');
+        window.location.href = '/admin';
+      } else {
+        console.log('Redirecting to /dashboard');
+        window.location.href = '/dashboard';
+      }
 
     } catch (err: any) {
       console.error('❌ Login error:', err);
