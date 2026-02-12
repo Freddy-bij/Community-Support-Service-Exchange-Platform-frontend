@@ -1,5 +1,4 @@
 import { Navigate } from "react-router";
-import AuthService from "../../services/AuthService";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -7,10 +6,11 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
-  const isAuthenticated = AuthService.isAuthenticated();
-  const user = AuthService.getCurrentUser();
+  const token = localStorage.getItem('authToken');
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
 
-  if (!isAuthenticated) {
+  if (!token) {
     return <Navigate to="/auth" replace />;
   }
 
