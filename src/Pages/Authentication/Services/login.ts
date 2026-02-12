@@ -33,6 +33,7 @@ export class LoginService {
       }
 
       if (responseData.token) {
+        localStorage.setItem('token', responseData.token);
         localStorage.setItem('authToken', responseData.token);
         localStorage.setItem('user', JSON.stringify(responseData.user));
         console.log('✅ Token saved to localStorage');

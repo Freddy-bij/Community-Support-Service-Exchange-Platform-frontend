@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
-import { FiEdit2, FiTrash2, FiPlus } from "react-icons/fi"
+import { FiEdit2, FiTrash2, FiPlus, FiX } from "react-icons/fi"
+import { Loader2 } from "lucide-react"
 import Categoryservice, { type Category } from "../Serivices/Categoryservice"
 
 const CategoriesManagement = () => {
@@ -9,8 +10,11 @@ const CategoriesManagement = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   const [showModal, setShowModal] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [newCategory, setNewCategory] = useState({ name: "", description: "" })
   const [submitting, setSubmitting] = useState(false)
+  const [success, setSuccess] = useState("")
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -40,28 +44,53 @@ const CategoriesManagement = () => {
     try {
       setSubmitting(true)
       setError("")
-      // Mock create - replace with actual API call when available
-      await new Promise(resolve => setTimeout(resolve, 500))
+      if (editMode && editingId) {
+        await Categoryservice.updateCategory(editingId, newCategory)
+        setSuccess("Category updated successfully")
+      } else {
+        await Categoryservice.createCategory(newCategory)
+        setSuccess("Category created successfully")
+      }
+      setTimeout(() => setSuccess(""), 3000)
       fetchCategories()
       setNewCategory({ name: "", description: "" })
       setShowModal(false)
+      setEditMode(false)
+      setEditingId(null)
     } catch (err: unknown) {
       if (err instanceof Error && (err.message.includes('409') || err.message.toLowerCase().includes('conflict') || err.message.toLowerCase().includes('already exists'))) {
         setError(`Category "${newCategory.name}" already exists. Please use a different name.`)
       } else {
-        setError("Failed to create category")
+        setError(`Failed to ${editMode ? 'update' : 'create'} category`)
       }
     } finally {
       setSubmitting(false)
     }
   }
 
+  const handleEdit = (category: Category) => {
+    setEditMode(true)
+    setEditingId(category.id)
+    setNewCategory({ name: category.name, description: category.description })
+    setShowModal(true)
+  }
+
+  const handleCloseModal = () => {
+    setShowModal(false)
+    setEditMode(false)
+    setEditingId(null)
+    setNewCategory({ name: "", description: "" })
+    setError("")
+  }
+
   const handleDelete = async (categoryId: string) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
         setActionLoading(categoryId)
-        // Mock delete - replace with actual API call when available
-        await new Promise(resolve => setTimeout(resolve, 500))
+        setError("")
+        await Categoryservice.deleteCategory(categoryId)
+        setSuccess("Category deleted successfully")
+        setTimeout(() => setSuccess(""), 3000)
         fetchCategories()
       } catch {
         setError("Failed to delete category")
@@ -87,6 +116,12 @@ const CategoriesManagement = () => {
         </button>
       </div>
 
+      {success && (
+        <div style={{ backgroundColor: '#d1fae5', padding: '12px 16px', borderRadius: '8px', color: '#065f46', marginBottom: '16px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          ✓ {success}
+        </div>
+      )}
+
       {error && (
         <div style={{ backgroundColor: '#fee2e2', padding: '12px 16px', borderRadius: '8px', color: '#991b1b', marginBottom: '16px', fontSize: '14px' }}>
           ⚠️ {error}
@@ -96,7 +131,12 @@ const CategoriesManagement = () => {
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
           <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '24px', maxWidth: '448px', width: '100%', margin: '0 16px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>Create New Category</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0 }}>{editMode ? 'Edit Category' : 'Create New Category'}</h2>
+              <button onClick={handleCloseModal} style={{ padding: '4px', border: 'none', background: 'none', cursor: 'pointer' }}>
+                <FiX size={20} />
+              </button>
+            </div>
             <input
               type="text"
               placeholder="Category name"
@@ -115,7 +155,7 @@ const CategoriesManagement = () => {
             />
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={handleCloseModal}
                 disabled={submitting}
                 style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '8px', backgroundColor: 'white', cursor: 'pointer', opacity: submitting ? 0.6 : 1 }}
               >
@@ -126,7 +166,7 @@ const CategoriesManagement = () => {
                 disabled={submitting}
                 style={{ padding: '8px 16px', backgroundColor: '#2C7A7B', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer', opacity: submitting ? 0.6 : 1 }}
               >
-                {submitting ? "Creating..." : "Create"}
+                {submitting ? (editMode ? "Updating..." : "Creating...") : (editMode ? "Update" : "Create")}
               </button>
             </div>
           </div>
@@ -134,8 +174,9 @@ const CategoriesManagement = () => {
       )}
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <p style={{ color: '#6b7280' }}>Loading categories...</p>
+        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: 'white', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <Loader2 style={{ width: '20px', height: '20px', animation: 'spin 1s linear infinite' }} />
+          <p style={{ color: '#6b7280', margin: 0 }}>Loading categories...</p>
         </div>
       ) : categories.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: 'white', borderRadius: '8px' }}>
@@ -170,6 +211,7 @@ const CategoriesManagement = () => {
 
               <div style={{ display: 'flex', gap: '8px', paddingTop: '16px', borderTop: '1px solid #e5e7eb' }}>
                 <button 
+                  onClick={() => handleEdit(category)}
                   disabled={actionLoading === category.id}
                   style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '8px 12px', backgroundColor: '#fed7aa', color: '#92400e', borderRadius: '8px', border: 'none', cursor: 'pointer', opacity: actionLoading === category.id ? 0.6 : 1 }}
                 >
