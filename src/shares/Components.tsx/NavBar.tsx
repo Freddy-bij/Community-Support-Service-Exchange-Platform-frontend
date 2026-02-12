@@ -4,17 +4,28 @@ import Logo from "../ui/logo";
 import Search from "../ui/search";
 import { Link } from "react-router";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
+import AuthService from "../../services/AuthService";
 
 const NavBar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(AuthService.getCurrentUser());
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    const handleStorageChange = () => {
+      setUser(AuthService.getCurrentUser());
+    };
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   return (
@@ -35,12 +46,14 @@ const NavBar = () => {
 
             <div className="hidden md:flex items-center gap-4">
               <Search />
-              <Link to="/admin">
-                <button className="relative overflow-hidden group bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-0.5">
-                  <span className="relative z-10">Admin Dashboard</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#3a9a9c] to-[#2C7A7B] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </button>
-              </Link>
+              {user ? (
+                <Link to={user.role === 'ADMIN' ? "/admin" : "/dashboard"}>
+                  <button className="relative overflow-hidden group bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-0.5">
+                    <span className="relative z-10">{user.role === 'ADMIN' ? 'Admin Dashboard' : 'User Dashboard'}</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#3a9a9c] to-[#2C7A7B] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </button>
+                </Link>
+              ): "" }
             </div>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -63,15 +76,27 @@ const NavBar = () => {
           <div className="px-4 pb-6 pt-2 bg-gray-50 border-t border-gray-200">
             <div className="flex flex-col gap-4">
               <Search />
-              <Link
-                to="/admin"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full"
-              >
-                <button className="w-full bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors duration-300 shadow-md">
-                  Admin Dashboard
-                </button>
-              </Link>
+              {user ? (
+                <Link
+                  to={user.role === 'ADMIN' ? "/admin" : "/dashboard"}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full"
+                >
+                  <button className="w-full bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors duration-300 shadow-md">
+                    {user.role === 'ADMIN' ? 'Admin Dashboard' : 'User Dashboard'}
+                  </button>
+                </Link>
+              ) : (
+                <Link
+                  to="/auth"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full"
+                >
+                  <button className="w-full bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors duration-300 shadow-md">
+                    Login
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

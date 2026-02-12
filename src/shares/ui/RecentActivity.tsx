@@ -1,11 +1,16 @@
 import { MessageCircle, Heart, Share2, Clock, Tag, Eye } from "lucide-react"
 import { Link } from "react-router"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import RequestService from "../../services/RequestService"
+import type { Request } from "../../services/RequestService"
+import CategoryService from "../../services/Categoryservice"
+import type { Category } from "../../services/Categoryservice"
+import AuthService from "../../services/AuthService"
 
 
 
 interface ActivityItem {
-  id: number;
+  id: string;
   user: {
     name: string;
     avatar: string;
@@ -15,68 +20,99 @@ interface ActivityItem {
   category: string;
   title: string;
   description: string;
-  status: "Looking For" | "Offering" | "Completed";
+  status: "Looking For" | "Offering";
   responses: number;
   views: number;
-  isLiked?: boolean;
+  isLiked: boolean;
 }
 
 const RecentActivity = () => {
-  const [activities, setActivities] = useState<ActivityItem[]>([
-    {
-      id: 1,
-      user: {
-        name: "Sarah Johnson",
-        avatar: "",
-        initials: "SJ"
-      },
-      timeAgo: "2 hours ago",
-      category: "Tutoring",
-      title: "Math tutor needed for high school algebra",
-      description: "Looking for someone to help my son prepare for his algebra final exam. 2-3 sessions per week would be ideal.",
-      status: "Looking For",
-      responses: 3,
-      views: 24,
-      isLiked: false
-    },
-    {
-      id: 2,
-      user: {
-        name: "Michael Chen",
-        avatar: "",
-        initials: "MC"
-      },
-      timeAgo: "5 hours ago",
-      category: "Tech Help",
-      title: "Need help setting up home network",
-      description: "Moving into a new house and need assistance with router configuration and WiFi optimization.",
-      status: "Looking For",
-      responses: 7,
-      views: 45,
-      isLiked: true
-    },
-    {
-      id: 3,
-      user: {
-        name: "Emily Rodriguez",
-        avatar: "",
-        initials: "ER"
-      },
-      timeAgo: "1 day ago",
-      category: "Gardening",
-      title: "Offering free gardening advice",
-      description: "Professional landscaper here! Happy to help with plant selection, garden design, or pest problems.",
-      status: "Offering",
-      responses: 12,
-      views: 89,
-      isLiked: false
-    }
-  ]);
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<Map<string, Category>>(new Map());
+  const currentUser = AuthService.getCurrentUser();
 
-  const toggleLike = (id: number) => {
-    setActivities(activities.map(activity => 
-      activity.id === id ? { ...activity, isLiked: !activity.isLiked } : activity
-    ));
+  useEffect(() => {
+    fetchActivities();
+  }, []);
+
+  const fetchActivities = async () => {
+    try {
+      setLoading(true);
+      const [requests, offers, categoriesData] = await Promise.all([
+        RequestService.getApprovedRequests('REQUEST'),
+        RequestService.getApprovedRequests('OFFER'),
+        CategoryService.getCategories()
+      ]);
+
+      const categoryMap = new Map(categoriesData.map(cat => [cat.id, cat]));
+      setCategories(categoryMap);
+
+      const allRequests = [...requests, ...offers]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 10);
+
+      const formattedActivities: ActivityItem[] = allRequests.map(req => ({
+        id: req.id,
+        user: {
+          name: req.userId || 'Anonymous',
+          avatar: '',
+          initials: getInitials(req.userId || 'Anonymous')
+        },
+        timeAgo: getTimeAgo(req.createdAt),
+        category: categoryMap.get(req.categoryId)?.name || 'General',
+        title: req.title,
+        description: req.description,
+        status: req.type === 'REQUEST' ? 'Looking For' : 'Offering',
+        responses: 0,
+        views: req.views,
+        isLiked: currentUser ? req.likedBy.includes(currentUser.id) : false
+      }));
+
+      setActivities(formattedActivities);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const getTimeAgo = (date: string) => {
+    const now = new Date();
+    const past = new Date(date);
+    const diffMs = now.getTime() - past.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 60) return `${diffMins} minutes ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays === 1) return '1 day ago';
+    return `${diffDays} days ago`;
+  };
+
+  const toggleLike = async (id: string) => {
+    if (!currentUser) return;
+    
+    const activity = activities.find(a => a.id === id);
+    if (!activity) return;
+
+    try {
+      if (activity.isLiked) {
+        await RequestService.unlikeRequest(id);
+      } else {
+        await RequestService.likeRequest(id);
+      }
+      setActivities(activities.map(a => 
+        a.id === id ? { ...a, isLiked: !a.isLiked } : a
+      ));
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
   };
 
   const getCategoryColor = (category: string) => {
@@ -116,7 +152,17 @@ const RecentActivity = () => {
           View All
         </Link>
       </div>
-      <div className="space-y-4">
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          <p className="mt-2 text-gray-600">Loading activities...</p>
+        </div>
+      ) : activities.length === 0 ? (
+        <div className="text-center py-12 bg-white rounded-2xl border border-gray-200">
+          <p className="text-gray-600">No approved activities yet.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
         {activities.map((activity) => (
           <div 
             key={activity.id}
@@ -203,11 +249,14 @@ const RecentActivity = () => {
           </div>
         ))}
       </div>
+      )}
+      {!loading && activities.length > 0 && (
       <div className="mt-6 text-center">
         <button className="px-6 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium">
           Load More Activities
         </button>
       </div>
+      )}
     </div>
     </div>
     
