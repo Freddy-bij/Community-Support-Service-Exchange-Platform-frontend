@@ -23,7 +23,17 @@ const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   
-  const currentUser = { name: "Admin", role: "Manager" }
+  const currentUser = (() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch {
+        return { name: "Admin", role: "Manager" };
+      }
+    }
+    return { name: "Admin", role: "Manager" };
+  })();
   const navigate = useNavigate()
 
   useEffect(() => {

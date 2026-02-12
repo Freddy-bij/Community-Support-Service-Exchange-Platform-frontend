@@ -20,7 +20,17 @@ export default function Dashboard() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
-  const currentUser = { name: "User", createdAt: new Date().toISOString() };
+  const currentUser = (() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch {
+        return { name: "User", createdAt: new Date().toISOString() };
+      }
+    }
+    return { name: "User", createdAt: new Date().toISOString() };
+  })();
 
   useEffect(() => {
     if (activeSection === "home") {
