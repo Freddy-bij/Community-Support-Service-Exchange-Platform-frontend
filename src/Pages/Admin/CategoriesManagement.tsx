@@ -52,7 +52,11 @@ const CategoriesManagement = () => {
       setNewCategory({ name: "", description: "" })
       setShowModal(false)
     } catch (err: any) {
-      setError(err.message || "Failed to create category")
+      if (err.message.includes('409') || err.message.toLowerCase().includes('conflict') || err.message.toLowerCase().includes('already exists')) {
+        setError(`Category "${newCategory.name}" already exists. Please use a different name.`)
+      } else {
+        setError(err.message || "Failed to create category")
+      }
     } finally {
       setSubmitting(false)
     }

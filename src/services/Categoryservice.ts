@@ -22,7 +22,7 @@ async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 2)
   
   for (let i = 0; i <= maxRetries; i++) {
     try {
-      console.log(`🔄 Attempt ${i + 1}/${maxRetries + 1} to fetch categories...`);
+      console.log(` Attempt ${i + 1}/${maxRetries + 1} to fetch categories...`);
       
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
