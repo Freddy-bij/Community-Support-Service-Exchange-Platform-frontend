@@ -1,6 +1,6 @@
 import { useState } from "react";
-import ConversationItem from "../../Pages/Dahboard/User/Components/ConversationItem";
-import ChatWindow from "../../Pages/Dahboard/User/Components/chatWindow";
+import ConversationItem from "./ConversationItem";
+import ChatWindow from "./chatWindow";
 
 interface MessageContent {
   from: string;
