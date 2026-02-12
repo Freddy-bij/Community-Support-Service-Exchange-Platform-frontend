@@ -3,11 +3,10 @@ import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import AuthService from '../../services/AuthService';
 
 interface LoginFormProps {
-  onLoginSuccess?: () => void;
   onSwitchToRegister?: () => void;
 }
 
-const LoginForm = ({ onLoginSuccess, onSwitchToRegister }: LoginFormProps) => {
+const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
