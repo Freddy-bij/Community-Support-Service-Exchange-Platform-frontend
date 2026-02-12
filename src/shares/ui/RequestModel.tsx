@@ -3,8 +3,8 @@
 
 import { X, Search, Sparkles, Loader2, AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
-import RequestService from "../../services/RequestService";
-import Categoryservice, { type Category } from "../../services/Categoryservice";
+import RequestService from "../../Pages/Dahboard/User/Services/RequestService";
+import Categoryservice, { type Category } from "../../Pages/Dahboard/Admin/Serivices/Categoryservice";
 
 interface CreateOfferModalProps {
   isOpen: boolean;
