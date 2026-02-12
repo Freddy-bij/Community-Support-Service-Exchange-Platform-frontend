@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { FiXCircle, FiCheck, FiClock, FiAlertCircle } from "react-icons/fi"
 import { Loader2 } from "lucide-react"
-import { getPendingRequests, approveRequest, rejectRequest, getRequests } from "../../services/api"
+import { getPendingRequests, approveRequest, rejectRequest } from "../../services/api"
 
 const RequestsManagement = () => {
   const [requests, setRequests] = useState<any[]>([])

@@ -43,7 +43,7 @@ const CategoriesManagement = () => {
     try {
       setSubmitting(true)
       setError("")
-      const createdCategory = await createCategory({
+      await createCategory({
         name: newCategory.name,
         description: newCategory.description,
         isActive: true,

@@ -2,9 +2,7 @@ import { MessageCircle, Heart, Share2, Clock, Tag, Eye } from "lucide-react"
 import { Link } from "react-router"
 import { useState, useEffect } from "react"
 import RequestService from "../../services/RequestService"
-import type { Request } from "../../services/RequestService"
 import CategoryService from "../../services/Categoryservice"
-import type { Category } from "../../services/Categoryservice"
 import AuthService from "../../services/AuthService"
 
 
@@ -29,7 +27,6 @@ interface ActivityItem {
 const RecentActivity = () => {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<Map<string, Category>>(new Map());
   const currentUser = AuthService.getCurrentUser();
 
   useEffect(() => {
@@ -46,7 +43,6 @@ const RecentActivity = () => {
       ]);
 
       const categoryMap = new Map(categoriesData.map(cat => [cat.id, cat]));
-      setCategories(categoryMap);
 
       const allRequests = [...requests, ...offers]
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
