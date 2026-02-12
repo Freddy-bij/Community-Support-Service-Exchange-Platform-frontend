@@ -9,6 +9,7 @@ import RequestsManagement from "./Component/RequestsManagement"
 import CategoriesManagement from "./Component/CategoriesManagement"
 import { useNavigate } from "react-router"
 import StatCard from "../../../shares/ui/statCart"
+import Analytics from "./Component/Analytics"
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("home")
@@ -171,7 +172,9 @@ const AdminDashboard = () => {
                     <RequestsManagement />
                   ) : activeSection === "categories" ? (
                     <CategoriesManagement />
-                  ) : (
+                  ) : activeSection === "analytics" ? (
+                    <div><Analytics/></div>
+                  ): (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                       
                       <div>
