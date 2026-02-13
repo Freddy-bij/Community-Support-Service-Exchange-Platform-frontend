@@ -1,0 +1,115 @@
+import { useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { FiMenu, FiBell, FiChevronDown, FiLogOut } from "react-icons/fi";
+import Sidebar from "../../../shares/ui/Sidebar";
+import { userSidebarItems } from "./config/sidebarConfig";
+
+export default function UserDashboardLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const navigate = useNavigate();
+
+  const currentUser = (() => {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch {
+        return { name: "User", createdAt: new Date().toISOString() };
+      }
+    }
+    return { name: "User", createdAt: new Date().toISOString() };
+  })();
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    navigate("/auth");
+  };
+
+  return (
+    <div className="fixed inset-0 flex bg-[#F8FAFC] overflow-hidden z-[9999]">
+      <Sidebar
+        items={userSidebarItems}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        title="SupportHub"
+        subtitle="User Portal"
+        onLogout={() => setShowLogoutModal(true)}
+      />
+
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 shrink-0">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <FiMenu size={22} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 md:gap-6">
+            <button className="relative p-2.5 text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">
+              <FiBell size={20} />
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
+
+            <div className="h-8 w-[1px] bg-gray-100 hidden sm:block" />
+
+            <div className="flex items-center gap-3 pl-2 group cursor-pointer">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-bold text-gray-800 leading-none">
+                  {currentUser?.name || "Member"}
+                </p>
+                <p className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-tighter">
+                  Gold Contributor
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C7A7B] to-[#37507E] flex items-center justify-center text-white font-bold shadow-md">
+                {currentUser?.name?.charAt(0).toUpperCase() || "U"}
+              </div>
+              <FiChevronDown className="text-gray-400" />
+            </div>
+          </div>
+        </header>
+
+        <div className="flex-1 flex flex-row overflow-hidden">
+          <div className="hidden md:block md:w-64 lg:w-72 shrink-0 h-full" />
+
+          <main className="flex-1 h-full overflow-y-auto p-4 md:p-8 lg:p-10">
+            <div className="max-w-7xl mx-auto w-full pb-10">
+              <Outlet />
+            </div>
+          </main>
+        </div>
+      </div>
+
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              !
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Confirm Logout</h2>
+            <p className="text-gray-500 mb-8">Are you sure you want to exit your dashboard?</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-3 bg-gray-50 text-gray-600 font-bold rounded-2xl hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 shadow-lg shadow-red-200 transition active:scale-95"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

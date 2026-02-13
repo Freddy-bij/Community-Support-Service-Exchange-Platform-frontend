@@ -1,28 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { FiUsers, FiFileText, FiDownload, FiActivity, FiBarChart2, FiTrendingUp, FiCheckCircle, FiMessageCircle, FiAlertCircle } from "react-icons/fi";
 import { Loader2, AlertCircle } from "lucide-react";
 import AnalyticsService from "../Serivices/Analyticsservice";
-import type { ActiveUser, CategoryData, ResolutionRates, SystemUsage, TimeBasedData } from "../Serivices/Types/types";
+import type { ResolutionRates, SystemUsage, TimeBasedData } from "../Serivices/Types/types";
 import StatCard from "./AnalyticsComponents/StatCard";
 import ResolutionMetrics from "./AnalyticsComponents/ResolutionMetrics";
-import ActiveUsersTable from "./AnalyticsComponents/ActiveUsersTable";
-import CategoryChart from "./AnalyticsComponents/CategoryChart";
-import ActivityTable from "./AnalyticsComponents/ActivityTable";
+import ActivityChart from "./AnalyticsComponents/ActivityChart";
 import ExportSection from "./AnalyticsComponents/ExportSection";
-import UserStatistics from "./AnalyticsComponents/UserStatistics";
 
 const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("daily");
   const [range, setRange] = useState(7);
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "requests" | "activity">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "activity">("overview");
 
-  const [requestsByCategory, setRequestsByCategory] = useState<CategoryData[]>([]);
-  const [mostActiveUsers, setMostActiveUsers] = useState<ActiveUser[]>([]);
   const [resolutionRates, setResolutionRates] = useState<ResolutionRates | null>(null);
   const [systemUsage, setSystemUsage] = useState<SystemUsage | null>(null);
   const [timeBasedData, setTimeBasedData] = useState<TimeBasedData[]>([]);
+
+  const fetchTimeBasedActivity = useCallback(async () => {
+    try {
+      const result = await AnalyticsService.getTimeBasedActivity(period, range);
+      setTimeBasedData(result.data);
+    } catch (err) {
+      console.error("Failed to fetch time-based activity:", err);
+    }
+  }, [period, range]);
 
   useEffect(() => {
     fetchAnalytics();
@@ -30,22 +34,18 @@ const Analytics = () => {
 
   useEffect(() => {
     fetchTimeBasedActivity();
-  }, [period, range]);
+  }, [fetchTimeBasedActivity]);
 
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const [categoryData, usersData, resolutionData, systemData] = await Promise.all([
-        AnalyticsService.getRequestsByCategory(),
-        AnalyticsService.getMostActiveUsers(10),
+      const [resolutionData, systemData] = await Promise.all([
         AnalyticsService.getResolutionRates(),
         AnalyticsService.getSystemUsage()
       ]);
 
-      setRequestsByCategory(categoryData);
-      setMostActiveUsers(usersData);
       setResolutionRates(resolutionData);
       setSystemUsage(systemData);
     } catch (err) {
@@ -53,15 +53,6 @@ const Analytics = () => {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchTimeBasedActivity = async () => {
-    try {
-      const result = await AnalyticsService.getTimeBasedActivity(period, range);
-      setTimeBasedData(result.data);
-    } catch (err) {
-      console.error("Failed to fetch time-based activity:", err);
     }
   };
 
@@ -102,13 +93,6 @@ const Analytics = () => {
             <FiDownload size={18} />
             Export CSV
           </button>
-          <button
-            onClick={() => handleExport('requests', 'json')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gray-700 text-white rounded-xl hover:bg-gray-800 transition font-semibold shadow-sm"
-          >
-            <FiDownload size={18} />
-            Export JSON
-          </button>
         </div>
       </div>
 
@@ -119,17 +103,14 @@ const Analytics = () => {
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="bg-white rounded-xl shadow-sm border p-1 flex gap-1">
+      <div className="bg-white rounded-xl shadow-sm  p-1 flex gap-1">
         {[
           { id: "overview", label: "Overview", icon: FiBarChart2 },
-          { id: "users", label: "Users", icon: FiUsers },
-          { id: "requests", label: "Requests", icon: FiFileText },
           { id: "activity", label: "Activity", icon: FiActivity }
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as "overview" | "users" | "requests" | "activity")}
+            onClick={() => setActiveTab(tab.id as "overview" | "activity")}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
               activeTab === tab.id
                 ? "bg-[#2C7A7B] text-white shadow-md"
@@ -150,6 +131,8 @@ const Analytics = () => {
               value={systemUsage.users.total}
               subtitle={`${systemUsage.users.activeUsers} active users`}
               icon={FiUsers}
+              gradientFrom="from-blue-500"
+              gradientTo="to-blue-600"
               secondaryIcon={FiTrendingUp}
             />
             <StatCard
@@ -157,6 +140,8 @@ const Analytics = () => {
               value={systemUsage.requests.total}
               subtitle="All time requests"
               icon={FiFileText}
+              gradientFrom="from-green-500"
+              gradientTo="to-green-600"
               secondaryIcon={FiCheckCircle}
             />
             <StatCard
@@ -164,6 +149,8 @@ const Analytics = () => {
               value={systemUsage.responses.total}
               subtitle="Community engagement"
               icon={FiMessageCircle}
+              gradientFrom="from-purple-500"
+              gradientTo="to-purple-600"
               secondaryIcon={FiActivity}
             />
             <StatCard
@@ -171,6 +158,8 @@ const Analytics = () => {
               value={systemUsage.users.newThisMonth}
               subtitle="User growth"
               icon={FiTrendingUp}
+              gradientFrom="from-orange-500"
+              gradientTo="to-orange-600"
               secondaryIcon={FiAlertCircle}
             />
           </div>
@@ -179,16 +168,8 @@ const Analytics = () => {
         </>
       )}
 
-      {activeTab === "users" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ActiveUsersTable users={mostActiveUsers} />
-          {systemUsage && <UserStatistics systemUsage={systemUsage} />}
-        </div>
-      )}
-      {activeTab === "requests" && <CategoryChart categories={requestsByCategory} />}
-
       {activeTab === "activity" && (
-        <ActivityTable
+        <ActivityChart
           data={timeBasedData}
           period={period}
           range={range}

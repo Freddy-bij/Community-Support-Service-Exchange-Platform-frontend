@@ -8,20 +8,9 @@ interface CategoryChartProps {
 const CategoryChart = ({ categories }: CategoryChartProps) => {
   const maxCount = Math.max(...categories.map(c => c.count));
   const totalCount = categories.reduce((sum, c) => sum + c.count, 0);
-  
-  const colors = [
-    'from-blue-500 to-blue-600',
-    'from-green-500 to-green-600',
-    'from-purple-500 to-purple-600',
-    'from-orange-500 to-orange-600',
-    'from-pink-500 to-pink-600',
-    'from-indigo-500 to-indigo-600',
-    'from-red-500 to-red-600',
-    'from-teal-500 to-teal-600'
-  ];
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
       <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
         <FiFileText className="text-[#2C7A7B]" />
         Requests by Category
@@ -31,10 +20,10 @@ const CategoryChart = ({ categories }: CategoryChartProps) => {
           const percentage = (category.count / maxCount) * 100;
           
           return (
-            <div key={category._id} className="p-4 bg-gray-50 rounded-xl hover:shadow-md transition border">
+            <div key={category._id} className="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition border border-gray-100">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-4 flex-1">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[index % colors.length]} flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+                  <div className="w-12 h-12 rounded-xl bg-[#2C7A7B] flex items-center justify-center text-white font-bold text-lg shadow-sm">
                     {index + 1}
                   </div>
                   <div className="flex-1">
@@ -49,7 +38,7 @@ const CategoryChart = ({ categories }: CategoryChartProps) => {
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
-                  className={`bg-gradient-to-r ${colors[index % colors.length]} h-3 rounded-full transition-all duration-500`}
+                  className="bg-[#2C7A7B] h-3 rounded-full transition-all duration-500"
                   style={{ width: `${percentage}%` }}
                 />
               </div>

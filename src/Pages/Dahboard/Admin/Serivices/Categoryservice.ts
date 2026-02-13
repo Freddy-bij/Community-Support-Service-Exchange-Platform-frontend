@@ -112,6 +112,76 @@ class CategoryService {
       throw error;
     }
   }
+
+  async createCategory(categoryData: { name: string; description: string }): Promise<Category> {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/categories`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(categoryData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create category');
+      }
+
+      return data.category;
+    } catch (error: unknown) {
+      console.error('❌ Error creating category:', error);
+      throw error;
+    }
+  }
+
+  async updateCategory(id: string, categoryData: { name: string; description: string }): Promise<Category> {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(categoryData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update category');
+      }
+
+      return data.category;
+    } catch (error: unknown) {
+      console.error('❌ Error updating category:', error);
+      throw error;
+    }
+  }
+
+  async deleteCategory(id: string): Promise<void> {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete category');
+      }
+    } catch (error: unknown) {
+      console.error('❌ Error deleting category:', error);
+      throw error;
+    }
+  }
 }
 
 export default new CategoryService();
