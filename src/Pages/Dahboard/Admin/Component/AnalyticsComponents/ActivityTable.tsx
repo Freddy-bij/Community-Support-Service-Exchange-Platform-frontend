@@ -11,7 +11,7 @@ interface ActivityTableProps {
 
 const ActivityTable = ({ data, period, range, onPeriodChange, onRangeChange }: ActivityTableProps) => {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
         <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
           <FiActivity className="text-[#2C7A7B]" />
@@ -21,7 +21,7 @@ const ActivityTable = ({ data, period, range, onPeriodChange, onRangeChange }: A
           <select
             value={period}
             onChange={(e) => onPeriodChange(e.target.value as "daily" | "weekly" | "monthly")}
-            className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+            className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent bg-white"
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -30,7 +30,7 @@ const ActivityTable = ({ data, period, range, onPeriodChange, onRangeChange }: A
           <select
             value={range}
             onChange={(e) => onRangeChange(Number(e.target.value))}
-            className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+            className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent bg-white"
           >
             <option value={7}>Last 7 days</option>
             <option value={14}>Last 14 days</option>
@@ -41,7 +41,7 @@ const ActivityTable = ({ data, period, range, onPeriodChange, onRangeChange }: A
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-50 border-b-2 border-gray-200">
+            <tr className="bg-gray-50 border-b-2 border-gray-100">
               <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Date</th>
               <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">Requests</th>
               <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">Responses</th>
@@ -59,12 +59,12 @@ const ActivityTable = ({ data, period, range, onPeriodChange, onRangeChange }: A
                   </span>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-gray-100 text-gray-700">
                     {item.responses}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-gray-100 text-gray-700">
                     {item.newUsers}
                   </span>
                 </td>
