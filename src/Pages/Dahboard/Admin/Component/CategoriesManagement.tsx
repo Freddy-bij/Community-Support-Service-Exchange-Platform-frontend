@@ -71,7 +71,7 @@ const CategoriesManagement = () => {
   const handleEdit = (category: Category) => {
     setEditMode(true)
     setEditingId(category.id)
-    setNewCategory({ name: category.name, description: category.description })
+    setNewCategory({ name: category.name, description: category.description || "" })
     setShowModal(true)
   }
 
