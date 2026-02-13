@@ -7,8 +7,11 @@ import { SiAbusedotch } from "react-icons/si"
 import { GrAnalytics } from "react-icons/gr"
 import RequestsManagement from "./Component/RequestsManagement"
 import CategoriesManagement from "./Component/CategoriesManagement"
+import UsersManagement from "./Component/UsersManagement"
+import AbuseReportsManagement from "./Component/AbuseReportsManagement"
 import { useNavigate } from "react-router"
 import StatCard from "../../../shares/ui/statCart"
+import { getDashboardStats } from "./Serivices/adminService"
 import Analytics from "./Component/Analytics"
 
 const AdminDashboard = () => {
@@ -38,18 +41,21 @@ const AdminDashboard = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchStats()
-  }, [])
+    if (activeSection === "home") {
+      fetchStats()
+    }
+  }, [activeSection])
 
   const fetchStats = async () => {
     try {
       setLoading(true)
-      // Mock data - replace with actual API call when available
+      setError("")
+      const data = await getDashboardStats()
       setStats({
-        totalUsers: 0,
-        pendingRequests: 0,
-        totalRequests: 0,
-        totalCategories: 0,
+        totalUsers: data.totalUsers || 0,
+        pendingRequests: data.pendingRequests || 0,
+        totalRequests: data.totalRequests || 0,
+        totalCategories: data.totalCategories || 0,
       })
     } catch {
       setError("Failed to fetch dashboard statistics.")
@@ -172,6 +178,11 @@ const AdminDashboard = () => {
                     <RequestsManagement />
                   ) : activeSection === "categories" ? (
                     <CategoriesManagement />
+                  ) : activeSection === "abuse-reports" ? (
+                    <AbuseReportsManagement />
+                  ) : activeSection === "users" ? (
+                    <UsersManagement />
+                  ):(
                   ) : activeSection === "analytics" ? (
                     <div><Analytics/></div>
                   ): (

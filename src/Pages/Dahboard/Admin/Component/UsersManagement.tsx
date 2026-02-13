@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react"
-import { FiTrash2, FiMail, FiLock } from "react-icons/fi"
+import { FiMail, FiLock, FiUnlock, FiSearch, FiEdit2, FiX } from "react-icons/fi"
+import { Loader2 } from "lucide-react"
+import { getUsers, banUser, unbanUser, updateUserRole } from "../Serivices/adminService"
 
 interface User {
   _id: string;
+  id: string;
   name: string;
   email: string;
   role: string;
@@ -14,9 +17,13 @@ const UsersManagement = () => {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [newRole, setNewRole] = useState("")
 
-  // Fetch users on component mount
   useEffect(() => {
     fetchUsers()
   }, [])
@@ -25,132 +32,172 @@ const UsersManagement = () => {
     try {
       setLoading(true)
       setError("")
-      // Mock data - replace with actual API call when available
-      setUsers([])
-    } catch {
-      setError("Failed to load users")
+      const data = await getUsers()
+      setUsers(data)
+    } catch (err: any) {
+      console.error('Fetch users error:', err)
+      setError(err.response?.data?.error || "Failed to load users")
     } finally {
       setLoading(false)
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      try {
-        setActionLoading(id)
-        // Mock delete - replace with actual API call when available
-        setUsers(users.filter(user => user._id !== id))
-      } catch {
-        setError("Failed to delete user")
-      } finally {
-        setActionLoading(null)
-      }
-    }
-  }
-
-  const handleBanUser = async (id: string) => {
+  const handleToggleBan = async (userId: string, isBanned: boolean) => {
     try {
-      setActionLoading(id)
-      // Mock ban - replace with actual API call when available
-      await new Promise(resolve => setTimeout(resolve, 500))
+      setActionLoading(userId)
+      setError("")
+      if (isBanned) {
+        await unbanUser(userId)
+        setSuccess("User unbanned successfully")
+      } else {
+        await banUser(userId)
+        setSuccess("User banned successfully")
+      }
+      setTimeout(() => setSuccess(""), 3000)
       fetchUsers()
-    } catch {
-      setError("Failed to ban user")
+    } catch (err: any) {
+      console.error('Ban/Unban error:', err)
+      setError(err.response?.data?.error || `Failed to ${isBanned ? 'unban' : 'ban'} user`)
     } finally {
       setActionLoading(null)
     }
   }
 
-  const getStatusColor = (status: string) => {
-    return status === 'active' ? { bg: '#dcfce7', text: '#15803d' } : { bg: '#fee2e2', text: '#991b1b' }
+  const handleEditUser = (user: User) => {
+    setEditingUser(user)
+    setNewRole(user.role)
+    setShowEditModal(true)
   }
 
-  const getRoleColor = (role: string) => {
-    switch(role) {
-      case 'admin': return { bg: '#dbeafe', text: '#1e40af' }
-      case 'helper': return { bg: '#fef3c7', text: '#92400e' }
-      default: return { bg: '#f3f4f6', text: '#374151' }
+  const handleUpdateRole = async () => {
+    if (!editingUser || !newRole) return
+    try {
+      setActionLoading(editingUser._id || editingUser.id)
+      setError("")
+      await updateUserRole(editingUser._id || editingUser.id, newRole)
+      setSuccess("User role updated successfully")
+      setTimeout(() => setSuccess(""), 3000)
+      setShowEditModal(false)
+      fetchUsers()
+    } catch (err: any) {
+      console.error('Update role error:', err)
+      setError(err.response?.data?.error || "Failed to update user role")
+    } finally {
+      setActionLoading(null)
     }
   }
 
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+    <div className="p-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>Users Management</h1>
-          <p style={{ color: '#6b7280', margin: '8px 0 0 0' }}>Manage platform users and their roles</p>
+          <h1 className="text-2xl font-bold">Users Management</h1>
+          <p className="text-gray-500">Manage platform users and their roles</p>
         </div>
-        <div style={{ backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>Total: <span style={{ fontWeight: 'bold' }}>{users.length}</span></p>
+        <div className="bg-white px-4 py-2 rounded-lg shadow-sm">
+          <p className="text-sm text-gray-600">Total: <span className="font-bold">{filteredUsers.length}</span></p>
         </div>
       </div>
 
+      <div className="bg-white p-4 rounded-xl shadow-sm mb-6">
+        <div className="relative">
+          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      {success && (
+        <div className="mb-6 flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <span className="text-green-600">✓</span>
+          <p className="text-sm text-green-700">{success}</p>
+        </div>
+      )}
+
       {error && (
-        <div style={{ backgroundColor: '#fee2e2', padding: '12px 16px', borderRadius: '8px', color: '#991b1b', marginBottom: '16px', fontSize: '14px' }}>
-          ⚠️ {error}
+        <div className="mb-6 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <span className="text-red-600">⚠️</span>
+          <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <p style={{ color: '#6b7280' }}>Loading users...</p>
+        <div className="bg-white rounded-xl p-8 flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-[#2C7A7B] mr-2" />
+          <span className="text-gray-600">Loading users...</span>
         </div>
-      ) : users.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', backgroundColor: 'white', borderRadius: '8px' }}>
-          <p style={{ color: '#6b7280' }}>No users found</p>
+      ) : filteredUsers.length === 0 ? (
+        <div className="bg-white rounded-xl p-8 text-center">
+          <p className="text-gray-600">No users found</p>
         </div>
       ) : (
-        <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b">
               <tr>
-                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Name</th>
-                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Email</th>
-                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Role</th>
-                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Status</th>
-                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Joined</th>
-                <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#374151' }}>Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {users.map((user, idx) => (
-                <tr key={user._id} style={{ borderBottom: idx < users.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
-                  <td style={{ padding: '16px 24px', fontWeight: '500' }}>{user.name || "N/A"}</td>
-                  <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <FiMail size={16} /> {user.email || "N/A"}
+            <tbody className="divide-y divide-gray-200">
+              {filteredUsers.map((user) => (
+                <tr key={user._id || user.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 font-medium text-gray-900">{user.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <FiMail size={16} /> {user.email}
                     </div>
                   </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <span style={{ padding: '4px 12px', backgroundColor: getRoleColor(user.role).bg, color: getRoleColor(user.role).text, fontSize: '12px', borderRadius: '9999px' }}>
-                      {user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "Member"}
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      user.role === 'admin' ? 'bg-blue-100 text-blue-700' : 
+                      user.role === 'helper' ? 'bg-yellow-100 text-yellow-700' : 
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     </span>
                   </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <span style={{ padding: '4px 12px', backgroundColor: getStatusColor(user.isBanned ? 'banned' : 'active').bg, color: getStatusColor(user.isBanned ? 'banned' : 'active').text, fontSize: '12px', borderRadius: '9999px' }}>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      user.isBanned ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                    }`}>
                       {user.isBanned ? "Banned" : "Active"}
                     </span>
                   </td>
-                  <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {new Date(user.createdAt).toLocaleDateString()}
                   </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <div style={{ display: 'flex', gap: '8px' }}>
+                  <td className="px-6 py-4">
+                    <div className="flex gap-2">
                       <button 
-                        onClick={() => handleBanUser(user._id)}
-                        disabled={actionLoading === user._id}
-                        style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#fef3c7', color: '#ca8a04', border: 'none', cursor: 'pointer', opacity: actionLoading === user._id ? 0.6 : 1 }}
-                        title="Ban user"
+                        onClick={() => handleEditUser(user)}
+                        disabled={actionLoading === (user._id || user.id)}
+                        className="p-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
+                        title="Edit user"
                       >
-                        <FiLock size={16} />
+                        <FiEdit2 size={16} />
                       </button>
-                      <button
-                        onClick={() => handleDelete(user._id)}
-                        disabled={actionLoading === user._id}
-                        style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#fee2e2', color: '#991b1b', border: 'none', cursor: 'pointer', opacity: actionLoading === user._id ? 0.6 : 1 }}
-                        title="Delete user"
+                      <button 
+                        onClick={() => handleToggleBan(user._id || user.id, user.isBanned)}
+                        disabled={actionLoading === (user._id || user.id)}
+                        className={`p-2 rounded-lg ${user.isBanned ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'} disabled:opacity-50 transition`}
+                        title={user.isBanned ? "Unban user" : "Ban user"}
                       >
-                        <FiTrash2 size={16} />
+                        {actionLoading === (user._id || user.id) ? <Loader2 size={16} className="animate-spin" /> : user.isBanned ? <FiUnlock size={16} /> : <FiLock size={16} />}
                       </button>
                     </div>
                   </td>
@@ -158,6 +205,48 @@ const UsersManagement = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {showEditModal && editingUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900">Edit User Role</h3>
+              <button onClick={() => setShowEditModal(false)} className="p-1 hover:bg-gray-100 rounded">
+                <FiX size={20} />
+              </button>
+            </div>
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">User: <span className="font-semibold">{editingUser.name}</span></p>
+              <p className="text-sm text-gray-600 mb-4">Email: {editingUser.email}</p>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
+              <select
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+              >
+                <option value="user">User</option>
+                <option value="helper">Helper</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateRole}
+                disabled={actionLoading === (editingUser._id || editingUser.id)}
+                className="flex-1 px-4 py-2.5 bg-[#2C7A7B] hover:bg-[#236565] text-white font-semibold rounded-xl transition-colors disabled:opacity-50"
+              >
+                {actionLoading === (editingUser._id || editingUser.id) ? "Updating..." : "Update Role"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
