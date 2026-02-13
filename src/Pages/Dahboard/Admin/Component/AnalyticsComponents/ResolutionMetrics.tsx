@@ -62,6 +62,27 @@ const ResolutionMetrics = ({ resolutionRates }: ResolutionMetricsProps) => {
           <p className="text-3xl font-bold text-[#2C7A7B] mt-1">{resolutionRates.resolutionRate}</p>
         </div>
       </div>
+      <div className="mt-6 pt-6 border-t border-gray-100 bg-gray-50 rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <FiClock className="text-gray-500" size={24} />
+            <div>
+              <p className="text-sm text-gray-500 font-medium">Average Resolution Time</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatResolutionTime(resolutionRates.averageResolutionTime)}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-gray-500">Efficiency Score</p>
+            <p className="text-lg font-bold text-[#2C7A7B]">
+              {resolutionRates.totalRequests > 0 
+                ? Math.round((resolutionRates.approvedRequests / resolutionRates.totalRequests) * 100) 
+                : 0}%
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

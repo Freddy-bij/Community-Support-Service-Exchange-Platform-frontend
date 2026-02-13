@@ -4,7 +4,7 @@ interface StatCardProps {
   title: string;
   value: number;
   subtitle: string;
-  icon: ComponentType<{ size?: number }>;
+  icon: ComponentType<{ size?: number; className?: string }>;
   gradientFrom: string;
   gradientTo: string;
   secondaryIcon: ComponentType<{ size?: number; className?: string }>;
