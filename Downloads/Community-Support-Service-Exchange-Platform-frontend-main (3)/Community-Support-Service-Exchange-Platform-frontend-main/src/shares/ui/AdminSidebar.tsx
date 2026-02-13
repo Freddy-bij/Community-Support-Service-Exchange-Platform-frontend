@@ -1,7 +1,7 @@
 import { Link } from "react-router"
 import { FiBarChart, FiAlertCircle, FiFolderPlus, FiEdit3, FiSettings, FiUsers, FiInbox } from "react-icons/fi"
 import { ChevronRight } from "lucide-react"
-import logo from "../../images/image.png"
+import logo from "../../"
 
 const AdminSidebar = () => {
   const adminItems = [

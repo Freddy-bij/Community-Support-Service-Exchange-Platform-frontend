@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { FiMenu, FiBell, FiChevronDown, FiLogOut } from "react-icons/fi";
+import { FiMenu, FiBell, FiChevronDown } from "react-icons/fi";
 import Sidebar from "../../../shares/ui/Sidebar";
 import { userSidebarItems } from "./config/sidebarConfig";
 
