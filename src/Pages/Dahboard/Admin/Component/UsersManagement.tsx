@@ -16,7 +16,7 @@ const UsersManagement = () => {
   const [error, setError] = useState("")
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
-  // Fetch users on component mount
+  
   useEffect(() => {
     fetchUsers()
   }, [])
