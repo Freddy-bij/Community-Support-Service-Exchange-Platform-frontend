@@ -9,6 +9,7 @@ import BrowserRequest from "./Components/BrowserRequest";
 import RequestService from "./Services/RequestService";
 import type { RequestType } from "./Services/Types/types";
 import Responseservice from "./Services/Responseservice";
+import CreateOfferModal from "../../../shares/ui/RequestModel";
 
 export default function Dashboard() {
   const [activeSection, setActiveSection] = useState("home");
@@ -20,7 +21,17 @@ export default function Dashboard() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
-  const currentUser = { name: "User", createdAt: new Date().toISOString() };
+  const currentUser = (() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch {
+        return { name: "User", createdAt: new Date().toISOString() };
+      }
+    }
+    return { name: "User", createdAt: new Date().toISOString() };
+  })();
 
   useEffect(() => {
     if (activeSection === "home") {
@@ -248,7 +259,16 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {isModalOpen && <div className="p-6 bg-white rounded-2xl border">Create Request Modal Placeholder</div>}
+      {isModalOpen && (
+        <CreateOfferModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={() => {
+            fetchMyRequests();
+            setIsModalOpen(false);
+          }}
+        />
+      )}
       
       {showLogoutModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
