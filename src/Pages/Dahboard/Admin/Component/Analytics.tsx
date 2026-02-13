@@ -1,10 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import { FiUsers, FiFileText, FiDownload, FiActivity, FiBarChart2, FiTrendingUp, FiCheckCircle, FiMessageCircle, FiAlertCircle } from "react-icons/fi";
+import { FiUsers, FiFileText, FiDownload, FiMessageCircle, FiTrendingUp, FiLayers } from "react-icons/fi";
 import { Loader2, AlertCircle } from "lucide-react";
 import AnalyticsService from "../Serivices/Analyticsservice";
-import type { ResolutionRates, SystemUsage, TimeBasedData } from "../Serivices/Types/types";
+import type { SystemUsage, TimeBasedData } from "../Serivices/Types/types";
 import StatCard from "./AnalyticsComponents/StatCard";
-import ResolutionMetrics from "./AnalyticsComponents/ResolutionMetrics";
 import ActivityChart from "./AnalyticsComponents/ActivityChart";
 import ExportSection from "./AnalyticsComponents/ExportSection";
 
@@ -13,9 +12,7 @@ const Analytics = () => {
   const [error, setError] = useState("");
   const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("daily");
   const [range, setRange] = useState(7);
-  const [activeTab, setActiveTab] = useState<"overview" | "activity">("overview");
 
-  const [resolutionRates, setResolutionRates] = useState<ResolutionRates | null>(null);
   const [systemUsage, setSystemUsage] = useState<SystemUsage | null>(null);
   const [timeBasedData, setTimeBasedData] = useState<TimeBasedData[]>([]);
 
@@ -41,12 +38,7 @@ const Analytics = () => {
       setLoading(true);
       setError("");
 
-      const [resolutionData, systemData] = await Promise.all([
-        AnalyticsService.getResolutionRates(),
-        AnalyticsService.getSystemUsage()
-      ]);
-
-      setResolutionRates(resolutionData);
+      const systemData = await AnalyticsService.getSystemUsage();
       setSystemUsage(systemData);
     } catch (err) {
       setError("Failed to load analytics data");
@@ -103,82 +95,57 @@ const Analytics = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm  p-1 flex gap-1">
-        {[
-          { id: "overview", label: "Overview", icon: FiBarChart2 },
-          { id: "activity", label: "Activity", icon: FiActivity }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as "overview" | "activity")}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === tab.id
-                ? "bg-[#2C7A7B] text-white shadow-md"
-                : "text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            <tab.icon size={18} />
-            <span className="hidden sm:inline">{tab.label}</span>
-          </button>
-        ))}
-      </div>
-
-      {activeTab === "overview" && systemUsage && (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard
-              title="Total Users"
-              value={systemUsage.users.total}
-              subtitle={`${systemUsage.users.activeUsers} active users`}
-              icon={FiUsers}
-              gradientFrom="from-blue-500"
-              gradientTo="to-blue-600"
-              secondaryIcon={FiTrendingUp}
-            />
-            <StatCard
-              title="Total Requests"
-              value={systemUsage.requests.total}
-              subtitle="All time requests"
-              icon={FiFileText}
-              gradientFrom="from-green-500"
-              gradientTo="to-green-600"
-              secondaryIcon={FiCheckCircle}
-            />
-            <StatCard
-              title="Total Responses"
-              value={systemUsage.responses.total}
-              subtitle="Community engagement"
-              icon={FiMessageCircle}
-              gradientFrom="from-purple-500"
-              gradientTo="to-purple-600"
-              secondaryIcon={FiActivity}
-            />
-            <StatCard
-              title="New This Month"
-              value={systemUsage.users.newThisMonth}
-              subtitle="User growth"
-              icon={FiTrendingUp}
-              gradientFrom="from-orange-500"
-              gradientTo="to-orange-600"
-              secondaryIcon={FiAlertCircle}
-            />
-          </div>
-
-          {resolutionRates && <ResolutionMetrics resolutionRates={resolutionRates} />}
-        </>
+      {/* Overview Stats */}
+      {systemUsage && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard
+            title="Total Users"
+            value={systemUsage.users.total}
+            subtitle={`${systemUsage.users.activeUsers} active users`}
+            icon={FiUsers}
+            gradientFrom="from-[#2C7A7B]"
+            gradientTo="to-[#10B981]"
+            secondaryIcon={FiTrendingUp}
+          />
+          <StatCard
+            title="Total Requests"
+            value={systemUsage.requests.total}
+            subtitle="All time requests"
+            icon={FiFileText}
+            gradientFrom="from-[#10B981]"
+            gradientTo="to-[#2C7A7B]"
+            secondaryIcon={FiFileText}
+          />
+          <StatCard
+            title="Total Responses"
+            value={systemUsage.responses.total}
+            subtitle="Community engagement"
+            icon={FiMessageCircle}
+            gradientFrom="from-gray-500"
+            gradientTo="to-gray-600"
+            secondaryIcon={FiMessageCircle}
+          />
+          <StatCard
+            title="Categories"
+            value={systemUsage.users.newThisMonth}
+            subtitle="Active categories"
+            icon={FiLayers}
+            gradientFrom="from-[#2C7A7B]"
+            gradientTo="to-gray-500"
+            secondaryIcon={FiLayers}
+          />
+        </div>
       )}
 
-      {activeTab === "activity" && (
-        <ActivityChart
-          data={timeBasedData}
-          period={period}
-          range={range}
-          onPeriodChange={setPeriod}
-          onRangeChange={setRange}
-        />
-      )}
+      {/* Activity Chart */}
+      <ActivityChart
+        data={timeBasedData}
+        period={period}
+        range={range}
+        onPeriodChange={setPeriod}
+        onRangeChange={setRange}
+      />
 
-      
       <ExportSection onExport={handleExport} />
     </div>
   );

@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { FiUsers, FiFileText, FiCheckCircle, FiClock } from "react-icons/fi";
 import { Loader2, AlertCircle } from "lucide-react";
+import AnalyticsService from "../Serivices/Analyticsservice";
+import type { ResolutionRates } from "../Serivices/Types/types";
+import ResolutionMetrics from "./AnalyticsComponents/ResolutionMetrics";
 
 const AdminDashboardHome = () => {
   const [loading, setLoading] = useState(true);
@@ -11,6 +14,7 @@ const AdminDashboardHome = () => {
     pendingRequests: 0,
     totalCategories: 0,
   });
+  const [resolutionRates, setResolutionRates] = useState<ResolutionRates | null>(null);
 
   const currentUser = (() => {
     const userStr = localStorage.getItem("user");
@@ -32,8 +36,8 @@ const AdminDashboardHome = () => {
     try {
       setLoading(true);
       setError("");
-      // Mock data - replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const resolutionData = await AnalyticsService.getResolutionRates();
+      setResolutionRates(resolutionData);
       setStats({
         totalUsers: 0,
         totalRequests: 0,
@@ -62,7 +66,7 @@ const AdminDashboardHome = () => {
         </div>
       )}
 
-      {/* Admin Profile Card */}
+    
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-5">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#2C7A7B] to-[#235E5F] flex items-center justify-center text-white text-3xl font-bold shadow-md">
@@ -90,7 +94,7 @@ const AdminDashboardHome = () => {
         </button>
       </div>
 
-      {/* Stats Cards */}
+     
       {loading ? (
         <div className="h-64 flex flex-col items-center justify-center bg-white rounded-2xl border border-gray-100">
           <Loader2 className="w-10 h-10 animate-spin text-[#2C7A7B] mb-3" />
@@ -143,6 +147,9 @@ const AdminDashboardHome = () => {
           </div>
         </div>
       )}
+
+      {/* Request Resolution Metrics */}
+      {resolutionRates && <ResolutionMetrics resolutionRates={resolutionRates} />}
 
       {/* System Status */}
       <div className="bg-gradient-to-br from-[#2C7A7B] to-[#235E5F] rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">

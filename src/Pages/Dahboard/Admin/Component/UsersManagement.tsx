@@ -34,9 +34,9 @@ const UsersManagement = () => {
       setError("")
       const data = await getUsers()
       setUsers(data)
-    } catch (err: any) {
+    } catch (err) {
       console.error('Fetch users error:', err)
-      setError(err.response?.data?.error || "Failed to load users")
+      setError(err instanceof Error && 'response' in err ? (err as { response?: { data?: { error?: string } } }).response?.data?.error || "Failed to load users" : "Failed to load users")
     } finally {
       setLoading(false)
     }
@@ -55,9 +55,9 @@ const UsersManagement = () => {
       }
       setTimeout(() => setSuccess(""), 3000)
       fetchUsers()
-    } catch (err: any) {
+    } catch (err) {
       console.error('Ban/Unban error:', err)
-      setError(err.response?.data?.error || `Failed to ${isBanned ? 'unban' : 'ban'} user`)
+      setError(err instanceof Error && 'response' in err ? (err as { response?: { data?: { error?: string } } }).response?.data?.error || `Failed to ${isBanned ? 'unban' : 'ban'} user` : `Failed to ${isBanned ? 'unban' : 'ban'} user`)
     } finally {
       setActionLoading(null)
     }
@@ -79,9 +79,9 @@ const UsersManagement = () => {
       setTimeout(() => setSuccess(""), 3000)
       setShowEditModal(false)
       fetchUsers()
-    } catch (err: any) {
+    } catch (err) {
       console.error('Update role error:', err)
-      setError(err.response?.data?.error || "Failed to update user role")
+      setError(err instanceof Error && 'response' in err ? (err as { response?: { data?: { error?: string } } }).response?.data?.error || "Failed to update user role" : "Failed to update user role")
     } finally {
       setActionLoading(null)
     }

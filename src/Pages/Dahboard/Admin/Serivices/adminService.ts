@@ -61,7 +61,7 @@ export const getRequests = async () => {
       headers: getAuthHeaders(),
       params: { type: 'REQUEST' }
     });
-    return data;
+    return Array.isArray(data) ? data : (data.content || data.data || []);
   } catch (error: any) {
     console.error('getRequests error:', error.response?.data || error.message);
     throw error;
