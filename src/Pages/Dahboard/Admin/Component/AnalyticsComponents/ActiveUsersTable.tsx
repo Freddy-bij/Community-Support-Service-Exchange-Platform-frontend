@@ -1,41 +1,68 @@
-import { FiUsers } from "react-icons/fi";
-import type { ActiveUser } from "../../Serivices/Types/types";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-interface ActiveUsersTableProps {
-  users: ActiveUser[];
+interface ActiveUser {
+  userId: string;
+  name: string;
+  email: string;
+  requestCount: number;
+  responseCount: number;
+  totalActivity: number;
 }
 
-const ActiveUsersTable = ({ users }: ActiveUsersTableProps) => {
+interface Props {
+  data: ActiveUser[];
+}
+
+const ActiveUsersTable = ({ data }: Props) => {
+  const chartData = data.map(user => ({
+    name: user.name,
+    requests: user.requestCount,
+    responses: user.responseCount,
+  }));
+
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm ">
-      <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-        <FiUsers className="text-[#2C7A7B]" />
-        Most Active Users
-      </h2>
-      <div className="space-y-3">
-        {users.map((user, index) => (
-          <div key={user.userId} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 ">
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg text-white ${
-                index === 0 ? 'bg-[#2C7A7B]' :
-                index === 1 ? 'bg-gray-400' :
-                index === 2 ? 'bg-gray-500' :
-                'bg-gray-300'
-              }`}>
-                {index + 1}
-              </div>
-              <div>
-                <p className="font-bold text-gray-900">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-[#2C7A7B]">{user.totalActivity}</p>
-              <p className="text-xs text-gray-500 font-medium">{user.requestCount} Req / {user.responseCount} Res</p>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h3 className="text-xl font-semibold mb-4 text-gray-800">Most Active Users</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chartData} layout="vertical">
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <XAxis 
+            type="number" 
+            tick={{ fontSize: 12 }}
+            stroke="#6b7280"
+          />
+          <YAxis 
+            dataKey="name" 
+            type="category" 
+            width={100}
+            tick={{ fontSize: 12 }}
+            stroke="#6b7280"
+          />
+          <Tooltip 
+            contentStyle={{ 
+              backgroundColor: 'white', 
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '8px'
+            }}
+          />
+          <Legend 
+            wrapperStyle={{ paddingTop: '10px' }}
+          />
+          <Bar 
+            dataKey="requests" 
+            fill="#2C7A7B" 
+            name="Requests"
+            radius={[0, 4, 4, 0]}
+          />
+          <Bar 
+            dataKey="responses" 
+            fill="#10b981" 
+            name="Responses"
+            radius={[0, 4, 4, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 };

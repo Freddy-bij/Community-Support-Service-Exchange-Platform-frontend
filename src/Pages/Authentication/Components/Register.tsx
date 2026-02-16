@@ -79,12 +79,11 @@ const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }: RegisterFormProps)
       setSuccess(response.message || 'Account created successfully!');
       
       setTimeout(() => {
-        if (onRegisterSuccess) {
-          onRegisterSuccess();
-        } else {
-          window.location.href = '/dashboard';
+        setSuccess('');
+        if (onSwitchToLogin) {
+          onSwitchToLogin();
         }
-      }, 1500);
+      }, 2000);
 
     } catch (err: unknown) {
       console.error('❌ Registration error:', err);

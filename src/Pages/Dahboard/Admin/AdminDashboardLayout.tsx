@@ -3,29 +3,22 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { FiMenu, FiBell, FiChevronDown, FiLogOut } from "react-icons/fi";
 import Sidebar from "../../../shares/ui/Sidebar";
 import { adminSidebarItems } from "./config/sidebarConfig";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
-
-  const currentUser = (() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        return JSON.parse(userStr);
-      } catch {
-        return { name: "Admin", role: "admin" };
-      }
-    }
-    return { name: "Admin", role: "admin" };
-  })();
+  const { user, logout, isLoading } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
+    logout();
     navigate("/auth");
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="fixed inset-0 flex bg-[#F8FAFC] overflow-hidden z-[9999]">
@@ -60,14 +53,18 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3 pl-2 group cursor-pointer">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold text-gray-800 leading-none">
-                  {currentUser?.name || "Admin"}
+                  {user?.name || "Admin"}
                 </p>
                 <p className="text-[10px] text-gray-400 font-semibold uppercase mt-1">
-                  {currentUser?.role || "Manager"}
+                  {user?.role || "Manager"}
                 </p>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C7A7B] to-[#37507E] flex items-center justify-center text-white font-bold shadow-md group-hover:shadow-lg transition-all">
-                {currentUser?.name?.charAt(0).toUpperCase() || "A"}
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2C7A7B] to-[#37507E] flex items-center justify-center text-white font-bold shadow-md group-hover:shadow-lg transition-all overflow-hidden">
+                {user?.profilePicture ? (
+                  <img src={`http://localhost:8080/${user.profilePicture}`} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  user?.name?.charAt(0).toUpperCase() || "A"
+                )}
               </div>
               <FiChevronDown className="text-gray-400 group-hover:text-gray-600 transition-colors" />
             </div>

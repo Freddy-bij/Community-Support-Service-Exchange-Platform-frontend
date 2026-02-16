@@ -265,6 +265,28 @@ class ResponseService {
       throw error;
     }
   }
+
+  async getResponseLikedBy(responseId: string): Promise<{ id: string; name: string }[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/responses/${responseId}/liked-by`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch liked by users');
+      }
+
+      return data.users || [];
+    } catch (error: unknown) {
+      console.error('❌ Error fetching liked by users:', error);
+      return [];
+    }
+  }
 }
 
 export default new ResponseService();

@@ -1,48 +1,49 @@
-import { useState, useEffect } from 'react';
-import { RefreshCw, Calendar, Users, FileText, MessageSquare, TrendingUp, Clock } from 'lucide-react';
-import analyticsService from '../Serivices/Analyticsservice';
-import StatCard from './AnalyticsComponents/StatCard';
-import CategoryChart from './AnalyticsComponents/CategoryChart';
-import ActivityChart from './AnalyticsComponents/ActivityChart';
-import ResolutionMetrics from './AnalyticsComponents/ResolutionMetrics';
-import ActiveUsersTable from './AnalyticsComponents/ActiveUsersTable';
-import ExportSection from './AnalyticsComponents/ExportSection';
+import { useEffect, useState } from "react"
+import { FiUsers, FiClock, FiCheckCircle, FiGrid } from "react-icons/fi"
+import { Loader2, AlertCircle, Users, FileText, MessageSquare, TrendingUp, Clock, RefreshCw, Calendar } from "lucide-react"
+import StatCard from "../shares/ui/statCart"
+import analyticsService from "./Dahboard/Admin/Serivices/Analyticsservice"
+import CategoryChart from "./Dahboard/Admin/Component/AnalyticsComponents/CategoryChart"
+import ActivityChart from "./Dahboard/Admin/Component/AnalyticsComponents/ActivityChart"
+import ResolutionMetrics from "./Dahboard/Admin/Component/AnalyticsComponents/ResolutionMetrics"
+import ActiveUsersTable from "./Dahboard/Admin/Component/AnalyticsComponents/ActiveUsersTable"
+import ExportSection from "./Dahboard/Admin/Component/AnalyticsComponents/ExportSection"
 
-const Analytics = () => {
-  const [loading, setLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState<any>(null);
-  const [activityData, setActivityData] = useState<any[]>([]);
-  const [timePeriod, setTimePeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [timeRange, setTimeRange] = useState(7);
+const DashboardHome = () => {
+  const [loading, setLoading] = useState(true)
+  const [dashboardData, setDashboardData] = useState<any>(null)
+  const [activityData, setActivityData] = useState<any[]>([])
+  const [timePeriod, setTimePeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily')
+  const [timeRange, setTimeRange] = useState(7)
 
   const fetchAnalytics = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       
       const [dashboard, activity] = await Promise.all([
         analyticsService.getComprehensiveDashboard(),
         analyticsService.getTimeBasedActivity(timePeriod, timeRange),
-      ]);
+      ])
 
-      setDashboardData(dashboard);
-      setActivityData(activity.data || activity);
+      setDashboardData(dashboard)
+      setActivityData(activity.data || activity)
     } catch (error) {
-      console.error('Error fetching analytics:', error);
+      console.error('Error fetching analytics:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchAnalytics();
-  }, [timePeriod, timeRange]);
+    fetchAnalytics()
+  }, [timePeriod, timeRange])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
       </div>
-    );
+    )
   }
 
   if (!dashboardData) {
@@ -50,17 +51,18 @@ const Analytics = () => {
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <p className="text-gray-600">No data available</p>
       </div>
-    );
+    )
   }
 
-  const { requestsByCategory, mostActiveUsers, resolutionRates, systemUsage } = dashboardData;
+  const { requestsByCategory, mostActiveUsers, resolutionRates, systemUsage } = dashboardData
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Analytics Dashboard</h1>
-          <p className="text-gray-600">Monitor your platform's performance and activity</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">Dashboard Overview</h1>
+          <p className="text-gray-500 mt-1">Real-time analytics and platform management.</p>
         </div>
         <button
           onClick={fetchAnalytics}
@@ -71,7 +73,7 @@ const Analytics = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
           title="Total Users"
           value={systemUsage?.users?.total || 0}
@@ -116,7 +118,7 @@ const Analytics = () => {
         />
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+      <div className="bg-white p-4 rounded-lg shadow-md">
         <div className="flex flex-wrap items-center gap-4">
           <Calendar className="w-5 h-5 text-gray-600" />
           <span className="text-gray-700 font-medium">Time Period:</span>
@@ -147,7 +149,7 @@ const Analytics = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-2">
           <ActivityChart data={activityData} />
         </div>
@@ -163,8 +165,9 @@ const Analytics = () => {
           <ExportSection />
         </div>
       </div>
-    </div>
-  );
-};
 
-export default Analytics;
+    </div>
+  )
+}
+
+export default DashboardHome

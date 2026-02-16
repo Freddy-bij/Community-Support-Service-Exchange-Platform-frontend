@@ -2,11 +2,9 @@ import type { ActiveUser, CategoryData, DashboardData, ResolutionRates, SystemUs
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
-
-
 class AnalyticsService {
   private getAuthToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem('token') || localStorage.getItem('authToken');
   }
 
   private async fetchWithAuth(url: string): Promise<Response> {

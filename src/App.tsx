@@ -8,15 +8,18 @@ import RequestsManagement from "./Pages/Dahboard/Admin/Component/RequestsManagem
 import CategoriesManagement from "./Pages/Dahboard/Admin/Component/CategoriesManagement";
 import AbuseReportsManagement from "./Pages/Dahboard/Admin/Component/AbuseReportsManagement";
 import UsersManagement from "./Pages/Dahboard/Admin/Component/UsersManagement";
-import Analytics from "./Pages/Dahboard/Admin/Component/Analytics";
 import AdminDashboardHome from "./Pages/Dahboard/Admin/Component/AdminDashboardHome";
+import AdminSettings from "./Pages/Dahboard/Admin/Component/AdminSettings";
 import BrowserRequest from "./Pages/Dahboard/User/Components/BrowserRequest";
 import LearderBoard from "./Pages/Dahboard/User/Components/LearderBoard";
 import Messages from "./Pages/Dahboard/User/Components/Messages";
 import UserDashboardHome from "./Pages/Dahboard/User/Components/UserDashboardHome";
+import Settings from "./Pages/Dahboard/User/Components/Settings";
+import { AuthProvider } from "./context/AuthContext";
 
 const App = () => {
   return (
+    <AuthProvider>
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
@@ -29,8 +32,8 @@ const App = () => {
         <Route path="categories" element={<CategoriesManagement />} />
         <Route path="abuse-reports" element={<AbuseReportsManagement />} />
         <Route path="users" element={<UsersManagement />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="settings" element={<div>Admin Settings</div>} />
+        <Route path="messages" element={<Messages />} />
+        <Route path="settings" element={<AdminSettings />} />
       </Route>
 
 
@@ -39,9 +42,10 @@ const App = () => {
         <Route path="messages" element={<Messages />} />
         <Route path="browse" element={<BrowserRequest />} />
         <Route path="leaderboard" element={<LearderBoard />} />
-        <Route path="settings" element={<div>User Settings</div>} />
+        <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>
+    </AuthProvider>
   );
 };
 

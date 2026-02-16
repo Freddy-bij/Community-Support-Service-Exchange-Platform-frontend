@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import { Search, MapPin, Heart, Eye, Loader2, AlertCircle } from "lucide-react";
+import { Search, MapPin, Heart, Eye, Loader2, AlertCircle, User } from "lucide-react";
 import type { Category } from "../../Admin/Serivices/Categoryservice";
 import Categoryservice from "../../Admin/Serivices/Categoryservice";
 import RequestService from "../Services/RequestService";
 import Responseservice from "../Services/Responseservice";
+import UserService from "../Services/UserService";
 import type { RequestType, ResponseType } from "../Services/Types/types";
+import { toast } from "../../../../shares/utils/toast";
 
 
 
@@ -13,6 +15,7 @@ const BrowserRequest = () => {
   const [requests, setRequests] = useState<RequestType[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<RequestType[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [responseCounts, setResponseCounts] = useState<Record<string, number>>({});
   
   const [selectedType, setSelectedType] = useState<"ALL" | "REQUEST" | "OFFER">("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
@@ -26,6 +29,9 @@ const BrowserRequest = () => {
   const [responses, setResponses] = useState<ResponseType[]>([]);
   const [responseContent, setResponseContent] = useState("");
   const [isSubmittingResponse, setIsSubmittingResponse] = useState(false);
+  const [responseLikedBy, setResponseLikedBy] = useState<Record<string, { id: string; name: string }[]>>({});
+  const [responseAuthors, setResponseAuthors] = useState<Record<string, string>>({});
+  const [likedResponses, setLikedResponses] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchCategories();
@@ -88,6 +94,19 @@ const BrowserRequest = () => {
       const allRequests = [...requestsData, ...offersData];
       console.log('Total requests:', allRequests);
       setRequests(allRequests);
+      
+      const counts: Record<string, number> = {};
+      await Promise.all(
+        allRequests.map(async (req) => {
+          try {
+            const responses = await Responseservice.getResponsesByRequest(req.id);
+            counts[req.id] = responses.length;
+          } catch {
+            counts[req.id] = 0;
+          }
+        })
+      );
+      setResponseCounts(counts);
     } catch (err: unknown) {
       console.error("Failed to fetch requests:", err);
       setError("Failed to load requests. Please try again.");
@@ -98,11 +117,13 @@ const BrowserRequest = () => {
 
   const handleLike = async (requestId: string) => {
     try {
-      await RequestService.likeRequest(requestId);
+      const likes = await RequestService.likeRequest(requestId);
+      toast.success(`You liked this request! Total likes: ${likes}`);
       fetchRequests();
     } catch (err: unknown) {
       console.error("Failed to like request:", err);
-      alert( "Failed to like request");
+      const errorMsg = err instanceof Error ? err.message : "Failed to like request";
+      toast.error(errorMsg);
     }
   };
 
@@ -111,6 +132,27 @@ const BrowserRequest = () => {
     try {
       const fetchedResponses = await Responseservice.getResponsesByRequest(request.id);
       setResponses(fetchedResponses as ResponseType[]);
+      
+      const responseLikes: Record<string, { id: string; name: string }[]> = {};
+      const authors: Record<string, string> = {};
+      const currentUser = JSON.parse(localStorage.getItem("user") || '{}');
+      const liked = new Set<string>();
+      
+      for (const resp of fetchedResponses) {
+        const [users, author] = await Promise.all([
+          Responseservice.getResponseLikedBy(resp.id),
+          UserService.getUserById(resp.userId)
+        ]);
+        responseLikes[resp.id] = users;
+        authors[resp.id] = author?.name || 'Unknown User';
+        if (resp.likedBy.includes(currentUser.id)) {
+          liked.add(resp.id);
+        }
+      }
+      
+      setResponseLikedBy(responseLikes);
+      setResponseAuthors(authors);
+      setLikedResponses(liked);
     } catch (err) {
       console.error("Failed to fetch responses:", err);
     }
@@ -130,12 +172,39 @@ const BrowserRequest = () => {
       // Add the new response to the list immediately
       setResponses([...responses, newResponse as ResponseType]);
       setResponseContent("");
-      alert("Response submitted successfully!");
+      toast.success("Your response has been submitted successfully!");
     } catch (err: unknown) {
       console.error("Failed to submit response:", err);
       alert("Failed to submit response");
     } finally {
       setIsSubmittingResponse(false);
+    }
+  };
+
+  const handleLikeResponse = async (responseId: string) => {
+    try {
+      const isLiked = likedResponses.has(responseId);
+      const newLikes = isLiked
+        ? await Responseservice.unlikeResponse(responseId)
+        : await Responseservice.likeResponse(responseId);
+
+      setResponses(prev =>
+        prev.map(r => r.id === responseId ? { ...r, likes: newLikes } : r)
+      );
+
+      setLikedResponses(prev => {
+        const newSet = new Set(prev);
+        isLiked ? newSet.delete(responseId) : newSet.add(responseId);
+        return newSet;
+      });
+
+      const users = await Responseservice.getResponseLikedBy(responseId);
+      setResponseLikedBy(prev => ({ ...prev, [responseId]: users }));
+
+      toast.success(isLiked ? "Like removed" : "Response liked!");
+    } catch (err) {
+      console.error("Failed to like response:", err);
+      toast.error("Failed to update like. Please try again.");
     }
   };
 
@@ -276,7 +345,7 @@ const BrowserRequest = () => {
                   </button>
                   <span className="flex items-center gap-1">
                     <Eye className="w-4 h-4" />
-                    {request.views}
+                    {responseCounts[request.id] || 0}
                   </span>
                 </div>
                 <button className="text-[#2C7A7B] text-sm font-medium hover:underline">
@@ -331,7 +400,7 @@ const BrowserRequest = () => {
                 </span>
                 <span className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
-                  {selectedRequest.views} views
+                  {responses.length} responses
                 </span>
                 <span>Posted: {new Date(selectedRequest.createdAt).toLocaleDateString()}</span>
               </div>
@@ -367,12 +436,39 @@ const BrowserRequest = () => {
                 <div className="space-y-4">
                   {responses.map((response) => (
                     <div key={response.id} className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-gray-700 mb-2">{response.content}</p>
-                      <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span>{new Date(response.createdAt).toLocaleString()}</span>
-                        <span className="flex items-center gap-1">
-                          <Heart className="w-3 h-3" />
+                      <div className="flex items-start gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-[#2C7A7B] flex items-center justify-center text-white text-sm font-bold">
+                          {responseAuthors[response.id]?.charAt(0).toUpperCase() || 'U'}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-sm text-gray-900">{responseAuthors[response.id] || 'Unknown User'}</span>
+                            <span className="text-xs text-gray-400">{new Date(response.createdAt).toLocaleString()}</span>
+                          </div>
+                          <p className="text-gray-700">{response.content}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-gray-500 mt-2 ml-11">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLikeResponse(response.id);
+                          }}
+                          className="flex items-center gap-1 hover:text-red-500 transition-colors"
+                        >
+                          <Heart
+                            className={`w-3 h-3 ${likedResponses.has(response.id) ? 'fill-red-500 text-red-500' : ''}`}
+                          />
                           {response.likes}
+                        </button>
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {response.likes} {response.likes === 1 ? 'view' : 'views'}
+                          {responseLikedBy[response.id]?.length > 0 && (
+                            <span className="ml-1">
+                              ({responseLikedBy[response.id].map(u => u.name).join(", ")})
+                            </span>
+                          )}
                         </span>
                       </div>
                     </div>
