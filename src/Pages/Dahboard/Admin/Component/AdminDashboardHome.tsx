@@ -1,163 +1,198 @@
-import { useState, useEffect } from "react";
-import { FiUsers, FiFileText, FiCheckCircle, FiClock } from "react-icons/fi";
-import { Loader2, AlertCircle } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { RefreshCw, Calendar, Users, FileText, MessageSquare, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { FiChevronDown } from 'react-icons/fi';
+import analyticsService from '../Serivices/Analyticsservice';
+import StatCard from './AnalyticsComponents/StatCard';
+import ActivityChart from './AnalyticsComponents/ActivityChart';
+import ResolutionMetrics from './AnalyticsComponents/ResolutionMetrics';
+import ActiveUsersTable from './AnalyticsComponents/ActiveUsersTable';
 
 const AdminDashboardHome = () => {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalRequests: 0,
-    pendingRequests: 0,
-    totalCategories: 0,
-  });
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [activityData, setActivityData] = useState<any[]>([]);
+  const [timePeriod, setTimePeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [timeRange, setTimeRange] = useState(7);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
-  const currentUser = (() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        return JSON.parse(userStr);
-      } catch {
-        return { name: "Admin", role: "admin", createdAt: new Date().toISOString() };
-      }
-    }
-    return { name: "Admin", role: "admin", createdAt: new Date().toISOString() };
-  })();
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
+  const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      setError("");
-      // Mock data - replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setStats({
-        totalUsers: 0,
-        totalRequests: 0,
-        pendingRequests: 0,
-        totalCategories: 0,
-      });
-    } catch {
-      setError("Failed to load dashboard statistics");
+      
+      const [dashboard, activity] = await Promise.all([
+        analyticsService.getComprehensiveDashboard(),
+        analyticsService.getTimeBasedActivity(timePeriod, timeRange),
+      ]);
+
+      console.log('📊 Activity Data from Backend:', activity);
+      console.log('📈 Dashboard Data:', dashboard);
+
+      setDashboardData(dashboard);
+      setActivityData(activity.data || activity);
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchAnalytics();
+  }, [timePeriod, timeRange]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <p className="text-gray-600">No data available</p>
+      </div>
+    );
+  }
+
+  const { requestsByCategory, mostActiveUsers, resolutionRates, systemUsage } = dashboardData;
+
+  const handleExport = async (type: 'requests' | 'users' | 'responses' | 'reports', format: 'csv' | 'json') => {
+    try {
+      if (format === 'csv') {
+        await analyticsService.exportToCSV(type);
+      } else {
+        await analyticsService.exportToJSON(type);
+      }
+      setShowExportMenu(false);
+    } catch (error) {
+      console.error('Export error:', error);
+      alert(`Failed to export ${type}`);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-extrabold text-gray-900">Admin Dashboard</h1>
-        <p className="text-gray-500 mt-1">Real-time analytics and platform management.</p>
-      </div>
-
-      {error && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl text-red-700">
-          <AlertCircle size={20} />
-          <p className="text-sm font-semibold">{error}</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+          <p className="text-gray-600">Monitor your platform's performance and activity</p>
         </div>
-      )}
-
-      {/* Admin Profile Card */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#2C7A7B] to-[#235E5F] flex items-center justify-center text-white text-3xl font-bold shadow-md">
-            {currentUser?.name?.charAt(0).toUpperCase() || "A"}
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">{currentUser?.name || "Admin"}</h3>
-            <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
-              <span className="px-2 py-1 bg-[#2C7A7B]/10 text-[#2C7A7B] rounded-md font-semibold text-xs">
-                {currentUser?.role?.toUpperCase() || "ADMIN"}
-              </span>
-              <span>|</span>
-              <span>
-                Joined{" "}
-                {new Date(currentUser?.createdAt || Date.now()).toLocaleDateString("en-US", {
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-          </div>
-        </div>
-        <button className="px-6 py-2.5 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:bg-gray-50 transition">
-          Edit Profile
-        </button>
-      </div>
-
-      {/* Stats Cards */}
-      {loading ? (
-        <div className="h-64 flex flex-col items-center justify-center bg-white rounded-2xl border border-gray-100">
-          <Loader2 className="w-10 h-10 animate-spin text-[#2C7A7B] mb-3" />
-          <span className="text-gray-400 font-medium">Loading platform stats...</span>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-gray-500 font-medium">Total Users</p>
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                <FiUsers className="text-gray-600" size={24} />
+        <div className="flex gap-3">
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-[#2C7A7B] text-white rounded-lg hover:bg-[#235E5F] transition shadow-md"
+            >
+              <FileText className="w-5 h-5" />
+              Export
+              <FiChevronDown className={`transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
+            </button>
+            {showExportMenu && (
+              <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                <div className="p-3 border-b border-gray-200">
+                  <p className="text-sm font-semibold text-gray-700">Export Data</p>
+                </div>
+                <div className="p-2">
+                  {(['requests', 'users', 'responses', 'reports'] as const).map((type) => (
+                    <div key={type} className="mb-2 last:mb-0">
+                      <p className="text-xs font-medium text-gray-600 px-3 py-1 capitalize">{type}</p>
+                      <div className="flex gap-2 px-3 py-1">
+                        <button
+                          onClick={() => handleExport(type, 'csv')}
+                          className="flex-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition text-sm"
+                        >
+                          CSV
+                        </button>
+                        <button
+                          onClick={() => handleExport(type, 'json')}
+                          className="flex-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition text-sm"
+                        >
+                          JSON
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-            <p className="text-4xl font-bold text-gray-900">{stats.totalUsers}</p>
-            <p className="text-sm text-gray-500 mt-2">Platform members</p>
+            )}
           </div>
-
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-gray-500 font-medium">Pending Items</p>
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                <FiClock className="text-gray-600" size={24} />
-              </div>
-            </div>
-            <p className="text-4xl font-bold text-gray-900">{stats.pendingRequests}</p>
-            <p className="text-sm text-gray-500 mt-2">Awaiting review</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-gray-500 font-medium">All Requests</p>
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                <FiCheckCircle className="text-gray-600" size={24} />
-              </div>
-            </div>
-            <p className="text-4xl font-bold text-gray-900">{stats.totalRequests}</p>
-            <p className="text-sm text-gray-500 mt-2">Total submissions</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-gray-500 font-medium">Categories</p>
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                <FiFileText className="text-gray-600" size={24} />
-              </div>
-            </div>
-            <p className="text-4xl font-bold text-gray-900">{stats.totalCategories}</p>
-            <p className="text-sm text-gray-500 mt-2">Active categories</p>
-          </div>
-        </div>
-      )}
-
-      {/* System Status */}
-      <div className="bg-gradient-to-br from-[#2C7A7B] to-[#235E5F] rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <h2 className="text-2xl font-bold">System Integrity Check</h2>
-            <p className="text-white/80 mt-1">
-              All systems are currently operational. No critical issues found.
-            </p>
-          </div>
-          <button className="bg-white text-[#2C7A7B] font-bold px-6 py-3 rounded-xl hover:bg-gray-50 transition-colors shadow-md active:scale-95">
-            Generate System Report
+          <button
+            onClick={fetchAnalytics}
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#2C7A7B] text-white rounded-lg hover:bg-[#235E5F] transition shadow-md"
+          >
+            <RefreshCw className="w-5 h-5" />
+            Refresh
           </button>
         </div>
-        <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-white/5 rounded-full" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <StatCard
+          title="Total Users"
+          value={systemUsage?.users?.total || 0}
+          icon={Users}
+          color="bg-[#2C7A7B]"
+          subtitle={`${systemUsage?.users?.newThisMonth || 0} new this month`}
+        />
+        <StatCard
+          title="Total Requests"
+          value={systemUsage?.requests?.total || 0}
+          icon={FileText}
+          color="bg-[#2C7A7B]"
+          subtitle={`${resolutionRates?.pendingRequests || 0} pending`}
+        />
+        <StatCard
+          title="Total Responses"
+          value={systemUsage?.responses?.total || 0}
+          icon={MessageSquare}
+          color="bg-[#2C7A7B]"
+          subtitle={`${systemUsage?.responses?.visible || 0} visible, ${systemUsage?.responses?.hidden || 0} hidden`}
+        />
+      </div>
+
+      <div className="bg-white p-4 rounded-lg shadow-md">
+        <div className="flex flex-wrap items-center gap-4">
+          <Calendar className="w-5 h-5 text-gray-600" />
+          <span className="text-gray-700 font-medium">Time Period:</span>
+          <div className="flex gap-2">
+            {(['daily', 'weekly', 'monthly'] as const).map((period) => (
+              <button
+                key={period}
+                onClick={() => setTimePeriod(period)}
+                className={`px-4 py-2 rounded-lg transition ${
+                  timePeriod === period
+                    ? 'bg-[#2C7A7B] text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {period.charAt(0).toUpperCase() + period.slice(1)}
+              </button>
+            ))}
+          </div>
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(Number(e.target.value))}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B]"
+          >
+            <option value={7}>Last 7</option>
+            <option value={14}>Last 14</option>
+            <option value={30}>Last 30</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="lg:col-span-2">
+          <ActivityChart data={activityData} />
+        </div>
+
+        <ResolutionMetrics data={resolutionRates || { totalRequests: 0, approvedRequests: 0, rejectedRequests: 0, pendingRequests: 0, resolutionRate: 0, averageResolutionTime: { hours: 0, days: 0 } }} />
+
+        <div className="lg:col-span-2">
+          <ActiveUsersTable data={mostActiveUsers || []} />
+        </div>
       </div>
     </div>
   );
