@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FiTrendingUp, FiMessageCircle, FiCheckCircle, FiStar, FiPlus, FiX } from "react-icons/fi";
-import { Loader2, AlertCircle, ChevronRight, Heart, Eye, MapPin, User } from "lucide-react";
+import { Loader2, AlertCircle, ChevronRight, Heart, Eye, MapPin } from "lucide-react";
 import RequestService from "../Services/RequestService";
 import Responseservice from "../Services/Responseservice";
 import UserService from "../Services/UserService";

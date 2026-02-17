@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Search, MapPin, Heart, Eye, Loader2, AlertCircle, User } from "lucide-react";
+import { Search, MapPin, Heart, Eye, Loader2, AlertCircle } from "lucide-react";
 import type { Category } from "../../Admin/Serivices/Categoryservice";
 import Categoryservice from "../../Admin/Serivices/Categoryservice";
 import RequestService from "../Services/RequestService";

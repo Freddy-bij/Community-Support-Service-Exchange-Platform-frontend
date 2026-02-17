@@ -4,7 +4,7 @@ interface ActivityData {
   date: string;
   requests: number;
   responses: number;
-  newUsers: number;
+  newUsers?: number;
 }
 
 interface Props {
