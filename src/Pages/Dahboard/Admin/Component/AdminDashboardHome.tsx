@@ -35,6 +35,7 @@ interface ActivityData {
   date: string;
   requests: number;
   responses: number;
+  newUsers?: number;
 }
 
 interface DashboardData {
@@ -63,7 +64,7 @@ const AdminDashboardHome = () => {
       console.log('📊 Activity Data from Backend:', activity);
       console.log('📈 Dashboard Data:', dashboard);
 
-      setDashboardData(dashboard as DashboardData);
+      setDashboardData(dashboard as unknown as DashboardData);
       setActivityData((activity.data || activity) as ActivityData[]);
     } catch (error) {
       console.error('Error fetching analytics:', error);

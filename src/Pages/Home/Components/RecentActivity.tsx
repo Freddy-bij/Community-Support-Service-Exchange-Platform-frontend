@@ -69,9 +69,9 @@ const RecentActivity = () => {
       const formattedActivities: ActivityItem[] = allRequests.map(req => ({
         id: req.id,
         user: {
-          name: req.username || req.userName || 'Anonymous',
+          name: req.username || 'Anonymous',
           avatar: '',
-          initials: getInitials(req.username || req.userName || 'Anonymous')
+          initials: getInitials(req.username || 'Anonymous')
         },
         timeAgo: getTimeAgo(req.createdAt),
         category: categoryMap.get(req.categoryId)?.name || 'General',
