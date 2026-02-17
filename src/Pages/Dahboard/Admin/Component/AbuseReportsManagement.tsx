@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { FiAlertTriangle, FiCheck, FiRefreshCw, FiSearch, FiFileText, FiChevronDown } from "react-icons/fi"
 import { Loader2, AlertTriangle, CheckCircle, Clock } from "lucide-react"
-import { getAbuseReports, resolveAbuseReport, reopenAbuseReport } from "../Serivices/adminService"
+import { getAbuseReports, resolveAbuseReport, reopenAbuseReport } from "../Serivices/AdminService"
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 

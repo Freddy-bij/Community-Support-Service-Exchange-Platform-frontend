@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { FiMail, FiLock, FiUnlock, FiSearch, FiEdit2, FiX } from "react-icons/fi"
 import { Loader2 } from "lucide-react"
-import { getUsers, banUser, unbanUser, updateUserRole } from "../Serivices/adminService"
+import { getUsers, banUser, unbanUser, updateUserRole } from "../Serivices/AdminService"
 
 interface User {
   _id: string;
