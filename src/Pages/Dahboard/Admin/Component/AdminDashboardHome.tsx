@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { RefreshCw, Calendar, Users, FileText, MessageSquare, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { RefreshCw, Calendar, Users, FileText, MessageSquare,  } from 'lucide-react';
 import { FiChevronDown } from 'react-icons/fi';
 import analyticsService from '../Serivices/Analyticsservice';
 import StatCard from './AnalyticsComponents/StatCard';
@@ -7,15 +7,51 @@ import ActivityChart from './AnalyticsComponents/ActivityChart';
 import ResolutionMetrics from './AnalyticsComponents/ResolutionMetrics';
 import ActiveUsersTable from './AnalyticsComponents/ActiveUsersTable';
 
+interface ActiveUser {
+  userId: string;
+  name: string;
+  email: string;
+  requestCount: number;
+  responseCount: number;
+  totalActivity: number;
+}
+
+interface ResolutionData {
+  totalRequests: number;
+  approvedRequests: number;
+  rejectedRequests: number;
+  pendingRequests: number;
+  resolutionRate: number;
+  averageResolutionTime: { hours: number; days: number };
+}
+
+interface SystemUsage {
+  users?: { total: number; newThisMonth: number };
+  requests?: { total: number };
+  responses?: { total: number; visible: number; hidden: number };
+}
+
+interface ActivityData {
+  date: string;
+  requests: number;
+  responses: number;
+}
+
+interface DashboardData {
+  mostActiveUsers: ActiveUser[];
+  resolutionRates: ResolutionData;
+  systemUsage: SystemUsage;
+}
+
 const AdminDashboardHome = () => {
   const [loading, setLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState<any>(null);
-  const [activityData, setActivityData] = useState<any[]>([]);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [activityData, setActivityData] = useState<ActivityData[]>([]);
   const [timePeriod, setTimePeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [timeRange, setTimeRange] = useState(7);
   const [showExportMenu, setShowExportMenu] = useState(false);
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -27,18 +63,18 @@ const AdminDashboardHome = () => {
       console.log('📊 Activity Data from Backend:', activity);
       console.log('📈 Dashboard Data:', dashboard);
 
-      setDashboardData(dashboard);
-      setActivityData(activity.data || activity);
+      setDashboardData(dashboard as DashboardData);
+      setActivityData((activity.data || activity) as ActivityData[]);
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [timePeriod, timeRange]);
 
   useEffect(() => {
     fetchAnalytics();
-  }, [timePeriod, timeRange]);
+  }, [fetchAnalytics]);
 
   if (loading) {
     return (
@@ -56,7 +92,7 @@ const AdminDashboardHome = () => {
     );
   }
 
-  const { requestsByCategory, mostActiveUsers, resolutionRates, systemUsage } = dashboardData;
+  const { mostActiveUsers, resolutionRates, systemUsage } = dashboardData;
 
   const handleExport = async (type: 'requests' | 'users' | 'responses' | 'reports', format: 'csv' | 'json') => {
     try {

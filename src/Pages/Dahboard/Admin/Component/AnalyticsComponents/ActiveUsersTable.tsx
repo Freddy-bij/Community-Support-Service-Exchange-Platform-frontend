@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface ActiveUser {
@@ -14,15 +15,20 @@ interface Props {
 }
 
 const ActiveUsersTable = ({ data }: Props) => {
-  const chartData = data.map(user => ({
-    name: user.name,
-    requests: user.requestCount,
-    responses: user.responseCount,
-  }));
+  const chartData = useMemo(() => 
+    data.map(user => ({
+      name: user.name,
+      requests: user.requestCount,
+      responses: user.responseCount,
+    })), [data]
+  );
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h3 className="text-xl font-semibold mb-4 text-gray-800">Most Active Users</h3>
+      {data.length === 0 ? (
+        <p className="text-gray-500 text-center py-8">No active users data available</p>
+      ) : (
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData} layout="vertical">
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -63,6 +69,7 @@ const ActiveUsersTable = ({ data }: Props) => {
           />
         </BarChart>
       </ResponsiveContainer>
+      )}
     </div>
   );
 };

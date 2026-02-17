@@ -184,40 +184,7 @@ const RequestsManagement = () => {
           <h1 className="text-2xl font-bold">Requests Management</h1>
           <p className="text-gray-500">Review and manage all service requests</p>
         </div>
-        <div className="relative">
-          <button
-            onClick={() => setShowExportMenu(!showExportMenu)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2C7A7B] text-white rounded-lg hover:bg-[#235E5F] transition shadow-md"
-          >
-            <FiFileText size={16} />
-            Export
-            <FiChevronDown className={`transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
-          </button>
-          {showExportMenu && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-              <div className="p-2">
-                <button
-                  onClick={exportToCSV}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 rounded transition"
-                >
-                  Export as CSV
-                </button>
-                <button
-                  onClick={exportToPDF}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 rounded transition"
-                >
-                  Export as PDF
-                </button>
-                <button
-                  onClick={exportToJSON}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 rounded transition"
-                >
-                  Export as JSON
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+       
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -289,6 +256,40 @@ const RequestsManagement = () => {
           <option value="REQUEST">Requests Only</option>
           <option value="OFFER">Offers Only</option>
         </select>
+         <div className="relative">
+          <button
+            onClick={() => setShowExportMenu(!showExportMenu)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#2C7A7B] text-white rounded-lg hover:bg-[#235E5F] transition shadow-md"
+          >
+            <FiFileText size={16} />
+            Export
+            <FiChevronDown className={`transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
+          </button>
+          {showExportMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+              <div className="p-2">
+                <button
+                  onClick={exportToCSV}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 rounded transition"
+                >
+                  Export as CSV
+                </button>
+                <button
+                  onClick={exportToPDF}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 rounded transition"
+                >
+                  Export as PDF
+                </button>
+                <button
+                  onClick={exportToJSON}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 rounded transition"
+                >
+                  Export as JSON
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {success && (

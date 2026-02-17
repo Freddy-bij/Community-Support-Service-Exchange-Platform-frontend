@@ -144,6 +144,8 @@ const CategoriesManagement = () => {
           <h1 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>Manage Categories</h1>
           <p style={{ color: '#6b7280', margin: '8px 0 0 0' }}>Create and manage content categories</p>
         </div>
+
+        
         <button
           onClick={() => setShowModal(true)}
           disabled={submitting}
@@ -152,26 +154,7 @@ const CategoriesManagement = () => {
           <FiPlus size={18} /> New Category
         </button>
       </div>
-
-      <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e5e7eb' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ flex: 1 }}>
-            <input
-              type="text"
-              placeholder="Search categories..."
-              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
-            />
-          </div>
-          <button
-            onClick={exportToPDF}
-            style={{ backgroundColor: '#2C7A7B', color: 'white', padding: '8px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
-          >
-            <FiFileText size={16} /> Export PDF
-          </button>
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', marginBottom: '24px' }}>
         <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
@@ -200,6 +183,27 @@ const CategoriesManagement = () => {
           </div>
         </div>
       </div>
+
+
+      <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e5e7eb' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ flex: 1 }}>
+            <input
+              type="text"
+              placeholder="Search categories..."
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+            />
+          </div>
+          <button
+            onClick={exportToPDF}
+            style={{ backgroundColor: '#2C7A7B', color: 'white', padding: '8px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
+          >
+            <FiFileText size={16} /> Export PDF
+          </button>
+        </div>
+      </div>
+
+      
 
       {success && (
         <div style={{ backgroundColor: '#d1fae5', padding: '12px 16px', borderRadius: '8px', color: '#065f46', marginBottom: '16px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
