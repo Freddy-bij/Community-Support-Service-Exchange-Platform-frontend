@@ -17,7 +17,6 @@ const AdminLayout = () => {
     { icon: FiFileText, label: "Requests", path: "/admin/requests" },
     { icon: FiGrid, label: "Categories", path: "/admin/categories" },
     { icon: SiAbusedotch, label: "Abuse Reports", path: "/admin/abuse-reports" },
-    // { icon: GrAnalytics, label: "Analytics", path: "/admin/analytics" },
     { icon: FiSettings, label: "Settings", path: "/admin/settings" },
   ]
 

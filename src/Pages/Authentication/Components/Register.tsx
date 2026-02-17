@@ -9,7 +9,7 @@ interface RegisterFormProps {
   onSwitchToLogin?: () => void;
 }
 
-const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }: RegisterFormProps) => {
+const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

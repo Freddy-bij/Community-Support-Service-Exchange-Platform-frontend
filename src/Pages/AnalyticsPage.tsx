@@ -1,7 +1,7 @@
-import Analytics from "./Dahboard/Admin/Component/Analytics"
+import AdminDashboardHome from "./Dahboard/Admin/Component/AdminDashboardHome"
 
 const AnalyticsPage = () => {
-  return <Analytics />
+  return <AdminDashboardHome />
 }
 
 export default AnalyticsPage

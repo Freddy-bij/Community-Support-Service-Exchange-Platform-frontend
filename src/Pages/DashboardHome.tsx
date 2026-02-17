@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
-import { FiUsers, FiClock, FiCheckCircle, FiGrid } from "react-icons/fi"
-import { Loader2, AlertCircle, Users, FileText, MessageSquare, TrendingUp, Clock, RefreshCw, Calendar } from "lucide-react"
+import { Users, FileText, MessageSquare, TrendingUp, Clock, RefreshCw, Calendar } from "lucide-react"
 import StatCard from "../shares/ui/statCart"
 import analyticsService from "./Dahboard/Admin/Serivices/Analyticsservice"
 import CategoryChart from "./Dahboard/Admin/Component/AnalyticsComponents/CategoryChart"
@@ -77,42 +76,42 @@ const DashboardHome = () => {
         <StatCard
           title="Total Users"
           value={systemUsage?.users?.total || 0}
-          icon={Users}
+          icon={<Users className="w-6 h-6" />}
           color="bg-blue-500"
           subtitle={`${systemUsage?.users?.newThisMonth || 0} new this month`}
         />
         <StatCard
           title="Active Users"
           value={systemUsage?.users?.activeUsers || 0}
-          icon={TrendingUp}
+          icon={<TrendingUp className="w-6 h-6" />}
           color="bg-green-500"
           subtitle="Last 30 days"
         />
         <StatCard
           title="Total Requests"
           value={systemUsage?.requests?.total || 0}
-          icon={FileText}
+          icon={<FileText className="w-6 h-6" />}
           color="bg-purple-500"
           subtitle={`${resolutionRates?.pendingRequests || 0} pending`}
         />
         <StatCard
           title="Total Responses"
           value={systemUsage?.responses?.total || 0}
-          icon={MessageSquare}
+          icon={<MessageSquare className="w-6 h-6" />}
           color="bg-indigo-500"
           subtitle="All time"
         />
         <StatCard
           title="Resolution Rate"
           value={`${resolutionRates?.resolutionRate || 0}%`}
-          icon={TrendingUp}
+          icon={<TrendingUp className="w-6 h-6" />}
           color="bg-emerald-500"
           subtitle={`${resolutionRates?.approvedRequests || 0} approved`}
         />
         <StatCard
           title="Avg Resolution Time"
           value={`${resolutionRates?.averageResolutionTime?.days?.toFixed(1) || 0} days`}
-          icon={Clock}
+          icon={<Clock className="w-6 h-6" />}
           color="bg-orange-500"
           subtitle={`${resolutionRates?.averageResolutionTime?.hours?.toFixed(1) || 0} hours`}
         />

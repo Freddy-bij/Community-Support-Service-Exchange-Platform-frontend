@@ -13,6 +13,7 @@ export interface CreateRequestData {
 export interface Request {
   id: string;
   userId: string;
+  username?: string;
   categoryId: string;
   title: string;
   description: string;

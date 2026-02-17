@@ -11,7 +11,7 @@ import UsersManagement from "./Pages/Dahboard/Admin/Component/UsersManagement";
 import AdminDashboardHome from "./Pages/Dahboard/Admin/Component/AdminDashboardHome";
 import AdminSettings from "./Pages/Dahboard/Admin/Component/AdminSettings";
 import BrowserRequest from "./Pages/Dahboard/User/Components/BrowserRequest";
-import LearderBoard from "./Pages/Dahboard/User/Components/LearderBoard";
+
 import Messages from "./Pages/Dahboard/User/Components/Messages";
 import UserDashboardHome from "./Pages/Dahboard/User/Components/UserDashboardHome";
 import Settings from "./Pages/Dahboard/User/Components/Settings";
@@ -41,7 +41,7 @@ const App = () => {
         <Route index element={<UserDashboardHome />} />
         <Route path="messages" element={<Messages />} />
         <Route path="browse" element={<BrowserRequest />} />
-        <Route path="leaderboard" element={<LearderBoard />} />
+   
         <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>

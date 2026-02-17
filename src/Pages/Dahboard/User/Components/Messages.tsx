@@ -37,7 +37,7 @@ const Messages = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [typingTimeout, setTypingTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [showAllUsers, setShowAllUsers] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +64,7 @@ const Messages = () => {
   useEffect(() => {
     fetchConversations();
     fetchAllUsers();
-    const socket = SocketService.connect(currentUser.id);
+    SocketService.connect(currentUser.id);
 
     SocketService.onReceiveMessage((message: Message) => {
       if (selectedUser && (message.senderId === selectedUser.user.id || message.receiverId === selectedUser.user.id)) {

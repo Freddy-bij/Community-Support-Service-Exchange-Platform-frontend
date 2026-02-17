@@ -1,4 +1,4 @@
-import { MessageCircle, Heart, Share2, Clock, Tag, Eye } from "lucide-react"
+import { MessageCircle, Heart, Share2, Clock, Tag, Eye, Send } from "lucide-react"
 import { Link } from "react-router"
 import { useState, useEffect } from "react"
 import RequestService from "../../Dahboard/User/Services/RequestService";
@@ -22,11 +22,14 @@ interface ActivityItem {
   responses: number;
   views: number;
   isLiked: boolean;
+  likes: number;
 }
 
 const RecentActivity = () => {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [respondingTo, setRespondingTo] = useState<string | null>(null);
+  const [responseText, setResponseText] = useState('');
   const currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null;
 
   useEffect(() => {
@@ -47,19 +50,17 @@ const RecentActivity = () => {
         return;
       }
       
-      const [requests, offers, categoriesData] = await Promise.all([
+      const [requests, categoriesData] = await Promise.all([
         RequestService.getApprovedRequests('REQUEST'),
-        RequestService.getApprovedRequests('OFFER'),
         Categoryservice.getCategories()
       ]);
 
       console.log('Requests:', requests);
-      console.log('Offers:', offers);
       console.log('Categories:', categoriesData);
 
       const categoryMap = new Map(categoriesData.map(cat => [cat.id, cat]));
 
-      const allRequests = [...requests, ...offers]
+      const allRequests = requests
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 10);
 
@@ -68,9 +69,9 @@ const RecentActivity = () => {
       const formattedActivities: ActivityItem[] = allRequests.map(req => ({
         id: req.id,
         user: {
-          name: req.userId || 'Anonymous',
+          name: req.username || 'Anonymous',
           avatar: '',
-          initials: getInitials(req.userId || 'Anonymous')
+          initials: getInitials(req.username || 'Anonymous')
         },
         timeAgo: getTimeAgo(req.createdAt),
         category: categoryMap.get(req.categoryId)?.name || 'General',
@@ -79,7 +80,8 @@ const RecentActivity = () => {
         status: req.type === 'REQUEST' ? 'Looking For' : 'Offering',
         responses: 0,
         views: req.views,
-        isLiked: currentUser ? req.likedBy.includes(currentUser.id) : false
+        likes: req.likes || 0,
+        isLiked: currentUser ? (req.likedBy?.includes(currentUser.id) || false) : false
       }));
 
       console.log('Formatted activities:', formattedActivities);
@@ -110,23 +112,65 @@ const RecentActivity = () => {
   };
 
   const toggleLike = async (id: string) => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      alert('Please login to like posts');
+      return;
+    }
     
     const activity = activities.find(a => a.id === id);
     if (!activity) return;
 
+    const wasLiked = activity.isLiked;
+    const newLikedState = !wasLiked;
+    const newLikesCount = wasLiked ? activity.likes - 1 : activity.likes + 1;
+
+    setActivities(prevActivities => prevActivities.map(a => 
+      a.id === id ? { 
+        ...a, 
+        isLiked: newLikedState,
+        likes: newLikesCount
+      } : a
+    ));
+
     try {
-      if (activity.isLiked) {
+      if (wasLiked) {
         await RequestService.unlikeRequest(id);
       } else {
         await RequestService.likeRequest(id);
       }
-      setActivities(activities.map(a => 
-        a.id === id ? { ...a, isLiked: !a.isLiked } : a
-      ));
     } catch (error) {
       console.error('Error toggling like:', error);
+      setActivities(prevActivities => prevActivities.map(a => 
+        a.id === id ? { 
+          ...a, 
+          isLiked: wasLiked,
+          likes: activity.likes
+        } : a
+      ));
     }
+  };
+
+  const handleRespond = (id: string) => {
+    if (!currentUser) {
+      alert('Please login to respond');
+      return;
+    }
+    setRespondingTo(respondingTo === id ? null : id);
+    setResponseText('');
+  };
+
+  const submitResponse = async (id: string) => {
+    if (!responseText.trim()) return;
+    
+    console.log('Submitting response to:', id, responseText);
+    
+    setActivities(prevActivities => prevActivities.map(a => 
+      a.id === id ? { ...a, responses: a.responses + 1 } : a
+    ));
+    
+    // TODO: Implement response submission API call
+    setRespondingTo(null);
+    setResponseText('');
   };
 
   const getCategoryColor = (category: string) => {
@@ -236,15 +280,15 @@ const RecentActivity = () => {
                         activity.isLiked ? 'fill-red-600' : ''
                       }`} 
                     />
-                    <span className="text-sm font-medium">Like</span>
+                    <span className="text-sm font-medium">{activity.likes}</span>
                   </button>
-                  <Link 
-                    to={`/request/${activity.id}`}
+                  <button 
+                    onClick={() => handleRespond(activity.id)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     <MessageCircle className="w-4 h-4" />
                     <span className="text-sm font-medium">Respond</span>
-                  </Link>
+                  </button>
                   <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors">
                     <Share2 className="w-4 h-4" />
                     <span className="text-sm font-medium">Share</span>
@@ -263,6 +307,33 @@ const RecentActivity = () => {
                   </div>
                 </div>
               </div>
+              {respondingTo === activity.id && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <textarea
+                    value={responseText}
+                    onChange={(e) => setResponseText(e.target.value)}
+                    placeholder="Write your response..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    rows={3}
+                  />
+                  <div className="flex justify-end gap-2 mt-2">
+                    <button
+                      onClick={() => setRespondingTo(null)}
+                      className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => submitResponse(activity.id)}
+                      disabled={!responseText.trim()}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Send className="w-4 h-4" />
+                      Send Response
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}

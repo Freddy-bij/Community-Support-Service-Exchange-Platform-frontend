@@ -1,5 +1,4 @@
 import { FiHome, FiFileText, FiGrid, FiUsers, FiSettings, FiLogOut, FiMessageSquare } from "react-icons/fi";
-import { GrAnalytics } from "react-icons/gr";
 import { SiAbusedotch } from "react-icons/si";
 
 export const adminSidebarItems = [

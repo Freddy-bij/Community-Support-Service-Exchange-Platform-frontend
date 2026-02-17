@@ -149,7 +149,7 @@ const AdminSettings = () => {
           <div className="relative">
             <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#2C7A7B] to-[#37507E] flex items-center justify-center text-white text-4xl font-bold overflow-hidden">
               {imagePreview || user?.profilePicture ? (
-                <img src={imagePreview || `http://localhost:8080/${user.profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={imagePreview || `http://localhost:8080/${user?.profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 user?.name?.charAt(0).toUpperCase() || 'A'
               )}
