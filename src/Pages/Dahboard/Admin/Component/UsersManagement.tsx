@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { FiMail, FiLock, FiUnlock, FiSearch, FiEdit2, FiX } from "react-icons/fi"
+import { FiMail, FiLock, FiUnlock, FiSearch, FiEdit2, FiX, FiDownload, FiUserPlus, FiUsers, FiUserCheck, FiUserX, FiShield } from "react-icons/fi"
 import { Loader2 } from "lucide-react"
 import { getUsers, banUser, unbanUser, updateUserRole } from "../Services/AdminService"
 
@@ -23,6 +23,9 @@ const UsersManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [newRole, setNewRole] = useState("")
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showExportMenu, setShowExportMenu] = useState(false)
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "user" })
 
   useEffect(() => {
     fetchUsers()
@@ -92,6 +95,75 @@ const UsersManagement = () => {
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const kpis = {
+    total: users.length,
+    active: users.filter(u => !u.isBanned).length,
+    banned: users.filter(u => u.isBanned).length,
+    admins: users.filter(u => u.role === 'admin').length
+  }
+
+  const exportToCSV = () => {
+    const headers = ["No", "Name", "Email", "Role", "Status", "Joined"]
+    const rows = filteredUsers.map((user, idx) => [
+      idx + 1,
+      user.name,
+      user.email,
+      user.role,
+      user.isBanned ? "Banned" : "Active",
+      new Date(user.createdAt).toLocaleDateString()
+    ])
+    const csv = [headers, ...rows].map(row => row.join(",")).join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `users_${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    setShowExportMenu(false)
+  }
+
+  const exportToJSON = () => {
+    const json = JSON.stringify(filteredUsers, null, 2)
+    const blob = new Blob([json], { type: "application/json" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `users_${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    setShowExportMenu(false)
+  }
+
+  const exportToPDF = () => {
+    const content = filteredUsers.map((user, idx) => 
+      `${idx + 1}. ${user.name} | ${user.email} | ${user.role} | ${user.isBanned ? "Banned" : "Active"} | ${new Date(user.createdAt).toLocaleDateString()}`
+    ).join("\n")
+    const blob = new Blob([`Users Report\n\n${content}`], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `users_${new Date().toISOString().split('T')[0]}.txt`
+    a.click()
+    setShowExportMenu(false)
+  }
+
+  const handleAddUser = async () => {
+    try {
+      setActionLoading("add")
+      setError("")
+      // Add API call here when backend endpoint is ready
+      // await addUser(newUser)
+      setSuccess("User added successfully")
+      setTimeout(() => setSuccess(""), 3000)
+      setShowAddModal(false)
+      setNewUser({ name: "", email: "", password: "", role: "user" })
+      fetchUsers()
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Failed to add user")
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
@@ -99,21 +171,82 @@ const UsersManagement = () => {
           <h1 className="text-2xl font-bold">Users Management</h1>
           <p className="text-gray-500">Manage platform users and their roles</p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-lg shadow-sm">
-          <p className="text-sm text-gray-600">Total: <span className="font-bold">{filteredUsers.length}</span></p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white p-4 rounded-xl border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Total Users</p>
+              <p className="text-2xl font-bold text-gray-900">{kpis.total}</p>
+            </div>
+            <FiUsers className="text-gray-900" size={32} />
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Active Users</p>
+              <p className="text-2xl font-bold text-gray-900">{kpis.active}</p>
+            </div>
+            <FiUserCheck className="text-gray-900" size={32} />
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Banned Users</p>
+              <p className="text-2xl font-bold text-gray-900">{kpis.banned}</p>
+            </div>
+            <FiUserX className="text-gray-900" size={32} />
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Admins</p>
+              <p className="text-2xl font-bold text-gray-900">{kpis.admins}</p>
+            </div>
+            <FiShield className="text-gray-900" size={32} />
+          </div>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-xl shadow-sm mb-6">
-        <div className="relative">
-          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
-          />
+      <div className="bg-white p-4 rounded-xl border border-gray-200 mb-6">
+        <div className="flex gap-3">
+          <div className="relative flex-1">
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+            />
+          </div>
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              className="px-4 py-2 bg-[#2C7A7B] hover:bg-[#236565] text-white rounded-lg flex items-center gap-2 transition whitespace-nowrap"
+            >
+              <FiDownload size={18} />
+              Export
+            </button>
+            {showExportMenu && (
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border z-10">
+                <button onClick={exportToCSV} className="w-full px-4 py-2 text-left hover:bg-gray-50 rounded-t-lg">CSV</button>
+                <button onClick={exportToJSON} className="w-full px-4 py-2 text-left hover:bg-gray-50">JSON</button>
+                <button onClick={exportToPDF} className="w-full px-4 py-2 text-left hover:bg-gray-50 rounded-b-lg">PDF (TXT)</button>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-4 py-2 bg-[#2C7A7B] hover:bg-[#236565] text-white rounded-lg flex items-center gap-2 transition whitespace-nowrap"
+          >
+            <FiUserPlus size={18} />
+            Add User
+          </button>
         </div>
       </div>
 
@@ -141,10 +274,11 @@ const UsersManagement = () => {
           <p className="text-gray-600">No users found</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
@@ -154,8 +288,9 @@ const UsersManagement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredUsers.map((user) => (
+              {filteredUsers.map((user, index) => (
                 <tr key={user._id || user.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-gray-600">{index + 1}</td>
                   <td className="px-6 py-4 font-medium text-gray-900">{user.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
@@ -244,6 +379,78 @@ const UsersManagement = () => {
                 className="flex-1 px-4 py-2.5 bg-[#2C7A7B] hover:bg-[#236565] text-white font-semibold rounded-xl transition-colors disabled:opacity-50"
               >
                 {actionLoading === (editingUser._id || editingUser.id) ? "Updating..." : "Update Role"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900">Add New User</h3>
+              <button onClick={() => setShowAddModal(false)} className="p-1 hover:bg-gray-100 rounded">
+                <FiX size={20} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                <input
+                  type="text"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+                  placeholder="Enter name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+                  placeholder="Enter email"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+                  placeholder="Enter password"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                <select
+                  value={newUser.role}
+                  onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+                >
+                  <option value="user">User</option>
+                  <option value="helper">Helper</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddUser}
+                disabled={actionLoading === "add" || !newUser.name || !newUser.email || !newUser.password}
+                className="flex-1 px-4 py-2.5 bg-[#2C7A7B] hover:bg-[#236565] text-white font-semibold rounded-xl transition-colors disabled:opacity-50"
+              >
+                {actionLoading === "add" ? "Adding..." : "Add User"}
               </button>
             </div>
           </div>

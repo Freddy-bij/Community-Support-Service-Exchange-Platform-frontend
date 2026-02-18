@@ -14,7 +14,7 @@ const getAuthHeaders = () => {
 export const getUsers = async () => {
   try {
     const { data } = await axios.get(`${API_URL}/admin/users`, { headers: getAuthHeaders() });
-    return data;
+    return data.users || data;
   } catch (error: any) {
     console.error('getUsers error:', error.response?.data || error.message);
     throw error;
