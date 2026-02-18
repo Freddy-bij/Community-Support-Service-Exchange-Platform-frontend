@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { FiXCircle, FiCheck, FiClock, FiAlertCircle, FiSearch, FiFileText, FiChevronDown } from "react-icons/fi"
 import { Loader2, FileText, CheckCircle, XCircle, Clock } from "lucide-react"
-import { getRequests, approveRequest, rejectRequest } from "../Serivices/AdminService"
+import { getRequests, approveRequest, rejectRequest } from "../Services/AdminService"
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 

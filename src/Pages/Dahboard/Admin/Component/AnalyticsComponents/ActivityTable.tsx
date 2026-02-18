@@ -1,5 +1,5 @@
 import { FiActivity } from "react-icons/fi";
-import type { TimeBasedData } from "../../Serivices/Types/types";
+import type { TimeBasedData } from "../../Services/Types/types";
 
 interface ActivityTableProps {
   data: TimeBasedData[];

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Users, FileText, MessageSquare, TrendingUp, Clock, RefreshCw, Calendar } from "lucide-react"
 import StatCard from "../shares/ui/statCart"
-import analyticsService from "./Dahboard/Admin/Serivices/Analyticsservice"
+import analyticsService from "./Dahboard/Admin/Services/Analyticsservice"
 import CategoryChart from "./Dahboard/Admin/Component/AnalyticsComponents/CategoryChart"
 import ActivityChart from "./Dahboard/Admin/Component/AnalyticsComponents/ActivityChart"
 import ResolutionMetrics from "./Dahboard/Admin/Component/AnalyticsComponents/ResolutionMetrics"

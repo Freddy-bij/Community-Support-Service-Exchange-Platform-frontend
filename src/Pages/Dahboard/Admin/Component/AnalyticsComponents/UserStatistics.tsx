@@ -1,5 +1,5 @@
 import { FiBarChart2 } from "react-icons/fi";
-import type { SystemUsage } from "../../Serivices/Types/types";
+import type { SystemUsage } from "../../Services/Types/types";
 
 interface UserStatisticsProps {
   systemUsage: SystemUsage;
