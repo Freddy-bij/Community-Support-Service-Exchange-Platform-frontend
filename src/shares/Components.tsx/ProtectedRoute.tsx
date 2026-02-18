@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
 
   useEffect(() => {
     const validateToken = async () => {
-      if (!token) {
+      if (!token || !user) {
         setIsValidating(false);
         setIsValid(false);
         return;
@@ -49,7 +49,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
     };
 
     validateToken();
-  }, [token]);
+  }, [token, user]);
 
   if (isValidating) {
     return (
@@ -59,7 +59,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
     );
   }
 
-  if (!token || !isValid) {
+  if (!token || !user || !isValid) {
     return <Navigate to="/auth" replace />;
   }
 
