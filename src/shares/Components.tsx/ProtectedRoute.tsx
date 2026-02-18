@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/users/profile`, {
+        const response = await fetch(`${API_BASE_URL}/auth/profile`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
