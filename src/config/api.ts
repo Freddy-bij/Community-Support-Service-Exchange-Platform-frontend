@@ -3,7 +3,7 @@ const isDevelopment = import.meta.env.DEV;
 const isProduction = import.meta.env.PROD;
 
 // Force production URLs for deployed builds
-const PRODUCTION_API_URL = 'https://community-support-flatform-backend-1-0ghf.onrender.com/api';
+const PRODUCTION_API_URL = 'https://community-support-flatform-backend-1-0ghf.onrender.com';
 const PRODUCTION_SOCKET_URL = 'https://community-support-flatform-backend-1-0ghf.onrender.com';
 
 // Use production URLs by default, only use localhost in specific dev cases
