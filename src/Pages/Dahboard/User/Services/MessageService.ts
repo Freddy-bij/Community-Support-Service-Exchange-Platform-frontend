@@ -6,8 +6,6 @@ export interface Message {
   senderId: string;
   receiverId: string;
   content: string;
-  messageType?: 'text' | 'image';
-  imageUrl?: string;
   isRead: boolean;
   createdAt: string;
   updatedAt: string;
@@ -84,40 +82,6 @@ class MessageService {
       });
     } catch (error) {
       console.error('Mark as read error:', error);
-    }
-  }
-
-  async sendMessage(receiverId: string, content: string, file?: File): Promise<Message> {
-    try {
-      const token = this.getAuthToken();
-      if (!token) throw new Error('Not authenticated');
-
-      const formData = new FormData();
-      formData.append('receiverId', receiverId);
-      
-      if (file) {
-        formData.append('image', file);
-        formData.append('messageType', 'image');
-      } else {
-        formData.append('content', content);
-        formData.append('messageType', 'text');
-      }
-
-      const response = await fetch(`${API_BASE_URL}/messages/send`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-
-      return data.data;
-    } catch (error) {
-      console.error('Send message error:', error);
-      throw error;
     }
   }
   async getAllUsers(): Promise<{ id: string; name: string; email: string }[]> {
