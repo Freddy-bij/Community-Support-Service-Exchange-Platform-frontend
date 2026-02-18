@@ -207,7 +207,7 @@ const Messages = () => {
                     <div className="relative">
                       <div className="w-12 h-12 rounded-full bg-[#2C7A7B] flex items-center justify-center text-white font-bold flex-shrink-0 overflow-hidden">
                         {user.profilePicture ? (
-                          <img src={`http://localhost:8080/${user.profilePicture}`} alt={user.name} className="w-full h-full object-cover" />
+                          <img src={`https://community-support-flatform-backend-1-0ghf.onrender.com/${user.profilePicture}`} alt={user.name} className="w-full h-full object-cover" />
                         ) : (
                           user.name.charAt(0).toUpperCase()
                         )}
@@ -240,7 +240,7 @@ const Messages = () => {
                   <div className="relative">
                     <div className="w-12 h-12 rounded-full bg-[#2C7A7B] flex items-center justify-center text-white font-bold flex-shrink-0 overflow-hidden">
                       {conv.user.profilePicture ? (
-                        <img src={`http://localhost:8080/${conv.user.profilePicture}`} alt={conv.user.name} className="w-full h-full object-cover" />
+                        <img src={`https://community-support-flatform-backend-1-0ghf.onrender.com/${conv.user.profilePicture}`} alt={conv.user.name} className="w-full h-full object-cover" />
                       ) : (
                         conv.user.name.charAt(0).toUpperCase()
                       )}
@@ -277,7 +277,7 @@ const Messages = () => {
               <div className="relative">
                 <div className="w-10 h-10 rounded-full bg-[#2C7A7B] flex items-center justify-center text-white font-bold overflow-hidden">
                   {selectedUser.user.profilePicture ? (
-                    <img src={`http://localhost:8080/${selectedUser.user.profilePicture}`} alt={selectedUser.user.name} className="w-full h-full object-cover" />
+                    <img src={`https://community-support-flatform-backend-1-0ghf.onrender.com/${selectedUser.user.profilePicture}`} alt={selectedUser.user.name} className="w-full h-full object-cover" />
                   ) : (
                     selectedUser.user.name.charAt(0).toUpperCase()
                   )}

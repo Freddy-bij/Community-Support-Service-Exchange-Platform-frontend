@@ -1,6 +1,5 @@
 import type { AuthResponse, RegisterData } from "./Types/types";
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import { API_BASE_URL } from '../../../config/api';
 
 export class RegisterService {
 

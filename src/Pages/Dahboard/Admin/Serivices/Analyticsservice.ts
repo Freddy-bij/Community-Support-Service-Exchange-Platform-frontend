@@ -1,6 +1,6 @@
 import type { ActiveUser, CategoryData, DashboardData, ResolutionRates, SystemUsage, TimeBasedData } from "./Types/types";
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'https://community-support-flatform-backend-1-0ghf.onrender.com/api';
 
 class AnalyticsService {
   private getAuthToken(): string | null {
