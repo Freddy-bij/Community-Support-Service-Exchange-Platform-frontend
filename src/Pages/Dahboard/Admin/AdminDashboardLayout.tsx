@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { FiMenu, FiBell, FiChevronDown, FiLogOut } from "react-icons/fi";
 import Sidebar from "../../../shares/ui/Sidebar";
-import { adminSidebarItems } from "./config/SidebarConfig";
+import { adminSidebarItems } from "./config/sidebarConfig";
 import { useAuth } from "../../../context/AuthContext";
 
 export default function AdminDashboard() {
