@@ -1,6 +1,5 @@
 import type { AuthResponse, LoginData } from "./Types/types";
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import { API_BASE_URL } from '../../../config/api';
 
 export class LoginService {
      async login(data: LoginData): Promise<AuthResponse> {

@@ -61,7 +61,7 @@ export default function UserDashboardLayout() {
               </div>
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2C7A7B] to-[#37507E] flex items-center justify-center text-white font-bold shadow-md overflow-hidden">
                 {user?.profilePicture ? (
-                  <img src={`http://localhost:8080/${user.profilePicture}`} alt={user.name} className="w-full h-full object-cover" />
+                  <img src={`https://community-support-flatform-backend-1-0ghf.onrender.com/${user.profilePicture}`} alt={user.name} className="w-full h-full object-cover" />
                 ) : (
                   user?.name?.charAt(0).toUpperCase() || "U"
                 )}

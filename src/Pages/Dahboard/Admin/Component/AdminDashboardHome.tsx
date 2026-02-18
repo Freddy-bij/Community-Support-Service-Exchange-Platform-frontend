@@ -224,18 +224,13 @@ const AdminDashboardHome = () => {
           <ActivityChart data={activityData} />
         </div>
 
-      <div className="flex  gap-6 ">
-       
+      <div className="flex  gap-6 ">       
         <div className='w-[40%]'>
            <ResolutionMetrics data={resolutionRates || { totalRequests: 0, approvedRequests: 0, rejectedRequests: 0, pendingRequests: 0, resolutionRate: 0, averageResolutionTime: { hours: 0, days: 0 } }} />
         </div>
         <div className='w-[60%] '>
             <ActiveUsersTable data={mostActiveUsers || []} />
         </div>
-
-        
-      
-        
       </div>
     </div>
   );
