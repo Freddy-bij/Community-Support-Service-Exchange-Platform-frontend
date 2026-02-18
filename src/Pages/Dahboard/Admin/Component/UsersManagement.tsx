@@ -165,55 +165,55 @@ const UsersManagement = () => {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-4 md:p-8">
+      <div className="flex justify-between items-center mb-4 md:mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Users Management</h1>
-          <p className="text-gray-500">Manage platform users and their roles</p>
+          <h1 className="text-xl md:text-2xl font-bold">Users Management</h1>
+          <p className="text-sm md:text-base text-gray-500">Manage platform users and their roles</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-xl border border-gray-200">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+        <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">{kpis.total}</p>
+              <p className="text-xs md:text-sm text-gray-600">Total Users</p>
+              <p className="text-xl md:text-2xl font-bold text-gray-900">{kpis.total}</p>
             </div>
-            <FiUsers className="text-gray-900" size={32} />
+            <FiUsers className="text-gray-900" size={24} />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-200">
+        <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Active Users</p>
-              <p className="text-2xl font-bold text-gray-900">{kpis.active}</p>
+              <p className="text-xs md:text-sm text-gray-600">Active Users</p>
+              <p className="text-xl md:text-2xl font-bold text-gray-900">{kpis.active}</p>
             </div>
-            <FiUserCheck className="text-gray-900" size={32} />
+            <FiUserCheck className="text-gray-900" size={24} />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-200">
+        <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Banned Users</p>
-              <p className="text-2xl font-bold text-gray-900">{kpis.banned}</p>
+              <p className="text-xs md:text-sm text-gray-600">Banned Users</p>
+              <p className="text-xl md:text-2xl font-bold text-gray-900">{kpis.banned}</p>
             </div>
-            <FiUserX className="text-gray-900" size={32} />
+            <FiUserX className="text-gray-900" size={24} />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-200">
+        <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Admins</p>
-              <p className="text-2xl font-bold text-gray-900">{kpis.admins}</p>
+              <p className="text-xs md:text-sm text-gray-600">Admins</p>
+              <p className="text-xl md:text-2xl font-bold text-gray-900">{kpis.admins}</p>
             </div>
-            <FiShield className="text-gray-900" size={32} />
+            <FiShield className="text-gray-900" size={24} />
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-xl border border-gray-200 mb-6">
-        <div className="flex gap-3">
+      <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 mb-4 md:mb-6">
+        <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
           <div className="relative flex-1">
             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
@@ -221,16 +221,17 @@ const UsersManagement = () => {
               placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
             />
           </div>
-          <div className="relative">
+          <div className="flex gap-2">
+          <div className="relative flex-1 sm:flex-none">
             <button
               onClick={() => setShowExportMenu(!showExportMenu)}
-              className="px-4 py-2 bg-[#2C7A7B] hover:bg-[#236565] text-white rounded-lg flex items-center gap-2 transition whitespace-nowrap"
+              className="w-full sm:w-auto px-3 md:px-4 py-2 bg-[#2C7A7B] hover:bg-[#236565] text-white rounded-lg flex items-center justify-center gap-2 transition whitespace-nowrap text-sm md:text-base"
             >
-              <FiDownload size={18} />
-              Export
+              <FiDownload size={16} />
+              <span className="hidden sm:inline">Export</span>
             </button>
             {showExportMenu && (
               <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border z-10">
@@ -242,40 +243,42 @@ const UsersManagement = () => {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 bg-[#2C7A7B] hover:bg-[#236565] text-white rounded-lg flex items-center gap-2 transition whitespace-nowrap"
+            className="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-[#2C7A7B] hover:bg-[#236565] text-white rounded-lg flex items-center justify-center gap-2 transition whitespace-nowrap text-sm md:text-base"
           >
-            <FiUserPlus size={18} />
-            Add User
+            <FiUserPlus size={16} />
+            <span className="hidden sm:inline">Add User</span>
           </button>
+          </div>
         </div>
       </div>
 
       {success && (
-        <div className="mb-6 flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+        <div className="mb-4 md:mb-6 flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
           <span className="text-green-600">✓</span>
-          <p className="text-sm text-green-700">{success}</p>
+          <p className="text-xs md:text-sm text-green-700">{success}</p>
         </div>
       )}
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mb-4 md:mb-6 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
           <span className="text-red-600">⚠️</span>
-          <p className="text-sm text-red-700">{error}</p>
+          <p className="text-xs md:text-sm text-red-700">{error}</p>
         </div>
       )}
 
       {loading ? (
-        <div className="bg-white rounded-xl p-8 flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-[#2C7A7B] mr-2" />
-          <span className="text-gray-600">Loading users...</span>
+        <div className="bg-white rounded-xl p-6 md:p-8 flex items-center justify-center">
+          <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-[#2C7A7B] mr-2" />
+          <span className="text-sm md:text-base text-gray-600">Loading users...</span>
         </div>
       ) : filteredUsers.length === 0 ? (
-        <div className="bg-white rounded-xl p-8 text-center">
-          <p className="text-gray-600">No users found</p>
+        <div className="bg-white rounded-xl p-6 md:p-8 text-center">
+          <p className="text-sm md:text-base text-gray-600">No users found</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px]">
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
@@ -340,6 +343,7 @@ const UsersManagement = () => {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
