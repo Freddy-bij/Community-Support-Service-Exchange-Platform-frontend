@@ -1,4 +1,4 @@
-// Environment-based API configuration
+
 const isDevelopment = import.meta.env.DEV;
 const isProduction = import.meta.env.PROD;
 
@@ -10,7 +10,7 @@ const PRODUCTION_SOCKET_URL = 'https://community-support-flatform-backend-1-0ghf
 export const API_BASE_URL = PRODUCTION_API_URL;
 export const SOCKET_URL = PRODUCTION_SOCKET_URL;
 
-// Debug logging
+
 console.log('🔧 API Configuration:', {
   isDevelopment,
   isProduction,
