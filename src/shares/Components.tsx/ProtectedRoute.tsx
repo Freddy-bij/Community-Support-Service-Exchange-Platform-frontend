@@ -1,4 +1,6 @@
 import { Navigate } from "react-router";
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../config/api";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -6,16 +8,63 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
+  const [isValidating, setIsValidating] = useState(true);
+  const [isValid, setIsValid] = useState(false);
   const token = localStorage.getItem('authToken');
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
 
-  if (!token) {
+  useEffect(() => {
+    const validateToken = async () => {
+      if (!token) {
+        setIsValidating(false);
+        setIsValid(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/profile`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          setIsValid(true);
+        } else {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setIsValid(false);
+        }
+      } catch (error) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setIsValid(false);
+      } finally {
+        setIsValidating(false);
+      }
+    };
+
+    validateToken();
+  }, [token]);
+
+  if (isValidating) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2C7A7B]"></div>
+      </div>
+    );
+  }
+
+  if (!token || !isValid) {
     return <Navigate to="/auth" replace />;
   }
 
-  if (requireAdmin && user?.role !== 'ADMIN') {
-    return <Navigate to="/" replace />;
+  if (requireAdmin && user?.role?.toLowerCase() !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
