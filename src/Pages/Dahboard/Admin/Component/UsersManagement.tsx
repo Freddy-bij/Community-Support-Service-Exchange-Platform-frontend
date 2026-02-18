@@ -20,6 +20,9 @@ const UsersManagement = () => {
   const [success, setSuccess] = useState("")
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 10
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [newRole, setNewRole] = useState("")
@@ -29,14 +32,15 @@ const UsersManagement = () => {
 
   useEffect(() => {
     fetchUsers()
-  }, [])
+  }, [currentPage])
 
   const fetchUsers = async () => {
     try {
       setLoading(true)
       setError("")
-      const data = await getUsers()
-      setUsers(data)
+      const data = await getUsers(currentPage, itemsPerPage)
+      setUsers(data.users)
+      setTotalPages(data.pagination.totalPages)
     } catch (err: any) {
       console.error('Fetch users error:', err)
       setError(err.response?.data?.error || "Failed to load users")
@@ -343,6 +347,23 @@ const UsersManagement = () => {
               ))}
             </tbody>
           </table>
+          </div>
+          <div className="flex items-center justify-between px-6 py-4 border-t">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-600">Page {currentPage} of {totalPages}</span>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition"
+            >
+              Next
+            </button>
           </div>
         </div>
       )}
