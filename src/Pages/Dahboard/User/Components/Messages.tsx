@@ -76,6 +76,29 @@ const Messages = () => {
 
     SocketService.onMessageSent((message: Message) => {
       setMessages((prev) => [...prev, message]);
+      fetchConversations();
+    });
+
+    SocketService.onUserStatusChange((data) => {
+      setConversations((prev) => 
+        prev.map((conv) => 
+          conv.user.id === data.userId 
+            ? { ...conv, user: { ...conv.user, isOnline: data.isOnline, lastSeen: data.lastSeen?.toString() } }
+            : conv
+        )
+      );
+      setAllUsers((prev) => 
+        prev.map((user) => 
+          user.id === data.userId 
+            ? { ...user, isOnline: data.isOnline, lastSeen: data.lastSeen?.toString() }
+            : user
+        )
+      );
+      if (selectedUser && selectedUser.user.id === data.userId) {
+        setSelectedUser((prev) => 
+          prev ? { ...prev, user: { ...prev.user, isOnline: data.isOnline, lastSeen: data.lastSeen?.toString() } } : null
+        );
+      }
     });
 
     SocketService.onUserTyping((data) => {
@@ -276,7 +299,7 @@ const Messages = () => {
             <div className="p-3 md:p-4 border-b flex items-center gap-2 md:gap-3">
               <button
                 onClick={() => setSelectedUser(null)}
-                className="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg -ml-2"
+                className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg -ml-2"
               >
                 ←
               </button>
