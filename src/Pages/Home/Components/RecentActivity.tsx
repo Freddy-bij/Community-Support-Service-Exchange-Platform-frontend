@@ -2,7 +2,7 @@ import { MessageCircle, Heart, Share2, Clock, Tag, Eye, Send } from "lucide-reac
 import { Link } from "react-router"
 import { useState, useEffect } from "react"
 import RequestService from "../../Dahboard/User/Services/RequestService";
-import Categoryservice from "../../Dahboard/Admin/Serivices/Categoryservice";
+import Categoryservice from "../../Dahboard/Admin/Services/Categoryservice";
 
 
 

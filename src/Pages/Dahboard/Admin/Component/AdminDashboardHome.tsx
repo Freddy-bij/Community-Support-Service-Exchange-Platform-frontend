@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, Calendar, Users, FileText, MessageSquare,  } from 'lucide-react';
 import { FiChevronDown } from 'react-icons/fi';
-import analyticsService from '../Serivices/Analyticsservice';
+import analyticsService from '../Services/Analyticsservice';
 import StatCard from './AnalyticsComponents/StatCard';
 import ActivityChart from './AnalyticsComponents/ActivityChart';
 import ResolutionMetrics from './AnalyticsComponents/ResolutionMetrics';

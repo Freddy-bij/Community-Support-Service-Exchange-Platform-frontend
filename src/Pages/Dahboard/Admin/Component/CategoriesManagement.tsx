@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { FiEdit2, FiTrash2, FiPlus, FiX, FiFileText } from "react-icons/fi"
 import { Loader2, FolderOpen, FolderCheck, Folder } from "lucide-react"
-import Categoryservice, { type Category } from "../Serivices/Categoryservice"
+import Categoryservice, { type Category } from "../Services/Categoryservice"
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
