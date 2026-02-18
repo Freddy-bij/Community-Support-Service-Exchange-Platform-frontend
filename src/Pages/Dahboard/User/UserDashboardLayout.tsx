@@ -21,7 +21,7 @@ export default function UserDashboardLayout() {
   }
 
   return (
-    <div className="fixed inset-0 flex bg-[#F8FAFC] overflow-hidden z-[9999]">
+    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
       <Sidebar
         items={userSidebarItems}
         isOpen={isSidebarOpen}
@@ -31,8 +31,8 @@ export default function UserDashboardLayout() {
         onLogout={() => setShowLogoutModal(true)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 shrink-0">
+      <div className="flex-1 flex flex-col min-w-0 w-full md:ml-64 lg:ml-72">
+        <header className="h-16 md:h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(true)}
@@ -71,15 +71,11 @@ export default function UserDashboardLayout() {
           </div>
         </header>
 
-        <div className="flex-1 flex flex-row overflow-hidden">
-          <div className="hidden md:block md:w-64 lg:w-72 shrink-0 h-full" />
-
-          <main className="flex-1 h-full overflow-y-auto p-4 md:p-8 lg:p-10">
-            <div className="max-w-7xl mx-auto w-full pb-10">
-              <Outlet />
-            </div>
-          </main>
-        </div>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto w-full">
+            <Outlet />
+          </div>
+        </main>
       </div>
 
       {showLogoutModal && (
