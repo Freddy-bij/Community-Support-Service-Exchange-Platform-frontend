@@ -12,9 +12,12 @@ const getAuthHeaders = () => {
 };
 
 // Users Management
-export const getUsers = async () => {
+export const getUsers = async (page = 1, limit = 10) => {
   try {
-    const { data } = await axios.get(`${API_URL}/admin/users`, { headers: getAuthHeaders() });
+    const { data } = await axios.get(`${API_URL}/admin/users`, { 
+      headers: getAuthHeaders(),
+      params: { page, limit }
+    });
     return data;
   } catch (error: any) {
     console.error('getUsers error:', error.response?.data || error.message);
@@ -56,11 +59,11 @@ export const updateUserRole = async (userId: string, role: string) => {
 };
 
 // Requests Management
-export const getRequests = async () => {
+export const getRequests = async (page = 1, limit = 10) => {
   try {
     const { data } = await axios.get(`${API_URL}/requests`, { 
       headers: getAuthHeaders(),
-      params: { type: 'REQUEST' }
+      params: { type: 'REQUEST', page, limit }
     });
     return data;
   } catch (error: any) {
@@ -90,9 +93,12 @@ export const rejectRequest = async (requestId: string) => {
 };
 
 // Abuse Reports
-export const getAbuseReports = async () => {
+export const getAbuseReports = async (page = 1, limit = 10) => {
   try {
-    const { data } = await axios.get(`${API_URL}/admin/abuse-reports`, { headers: getAuthHeaders() });
+    const { data } = await axios.get(`${API_URL}/admin/abuse-reports`, { 
+      headers: getAuthHeaders(),
+      params: { page, limit }
+    });
     return data;
   } catch (error: any) {
     console.error('getAbuseReports error:', error.response?.data || error.message);
