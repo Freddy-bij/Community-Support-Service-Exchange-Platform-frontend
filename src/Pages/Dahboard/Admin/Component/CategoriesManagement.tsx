@@ -139,7 +139,7 @@ const CategoriesManagement = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div className='space-y-2 sm:flex justify-between items-center mb-6' >
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>Manage Categories</h1>
           <p style={{ color: '#6b7280', margin: '8px 0 0 0' }}>Create and manage content categories</p>

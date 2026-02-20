@@ -61,7 +61,7 @@ export default function AdminDashboard() {
               </div>
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2C7A7B] to-[#37507E] flex items-center justify-center text-white font-bold shadow-md group-hover:shadow-lg transition-all overflow-hidden">
                 {user?.profilePicture ? (
-                  <img src={`https://community-support-flatform-backend-1-0ghf.onrender.com/${user.profilePicture}`} alt={user.name} className="w-full h-full object-cover" />
+                  <img src={`https://community-support-flatform-backend-1-0ghf.onrender.com/${user.profilePicture}`} alt={user.name} className="w-full h-full object-cover " />
                 ) : (
                   user?.name?.charAt(0).toUpperCase() || "A"
                 )}
@@ -72,9 +72,7 @@ export default function AdminDashboard() {
         </header>
 
         <div className="flex-1 flex flex-row overflow-hidden">
-          <div className="hidden md:block md:w-64 lg:w-72 shrink-0 h-full" />
-
-          <main className="flex-1 h-full overflow-y-auto p-4 md:p-8 lg:p-10">
+          <main className="flex-1 h-full overflow-y-auto p-4 md:p-8 lg:p-10 md:ml-64 lg:ml-72">
             <div className="max-w-7xl mx-auto w-full pb-10">
               <Outlet />
             </div>

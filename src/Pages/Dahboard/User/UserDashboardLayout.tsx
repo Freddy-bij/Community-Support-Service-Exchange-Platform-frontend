@@ -72,9 +72,7 @@ export default function UserDashboardLayout() {
         </header>
 
         <div className="flex-1 flex flex-row overflow-hidden">
-          <div className="hidden md:block md:w-64 lg:w-72 shrink-0 h-full" />
-
-          <main className="flex-1 h-full overflow-y-auto p-4 md:p-8 lg:p-10">
+          <main className="flex-1 h-full overflow-y-auto p-4 md:p-8 lg:p-10 md:ml-64 lg:ml-72">
             <div className="max-w-7xl mx-auto w-full pb-10">
               <Outlet />
             </div>

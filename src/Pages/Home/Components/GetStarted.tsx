@@ -90,11 +90,8 @@ const GettingStarted = () => {
                 </div>
               </button>
             ) : (
-              <Link 
-                key={index} 
-                to={action.link || "#"}
-                className="group relative"
-              >
+             
+              
                 <div className="relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden h-full">
                   <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
 
@@ -117,7 +114,7 @@ const GettingStarted = () => {
                     </svg>
                   </div>
                 </div>
-              </Link>
+              
             )
           ))}
         </div>

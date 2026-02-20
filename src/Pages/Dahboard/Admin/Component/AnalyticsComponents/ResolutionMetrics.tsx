@@ -29,7 +29,7 @@ const ResolutionMetrics = ({ data }: Props) => {
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h3 className="text-xl font-semibold mb-4 text-gray-800">Resolution Status</h3>
       
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid sm:grid-cols-2 gap-4 mb-6">
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
           <p className="text-sm text-gray-600">Resolution Rate</p>
           <p className="text-2xl font-bold text-[#2C7A7B]">{data.resolutionRate}%</p>

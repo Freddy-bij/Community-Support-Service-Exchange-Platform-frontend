@@ -61,9 +61,6 @@ const AdminDashboardHome = () => {
         analyticsService.getTimeBasedActivity(timePeriod, timeRange),
       ]);
 
-      console.log('📊 Activity Data from Backend:', activity);
-      console.log('📈 Dashboard Data:', dashboard);
-
       setDashboardData(dashboard as unknown as DashboardData);
       setActivityData((activity.data || activity) as ActivityData[]);
     } catch (error) {
@@ -111,7 +108,7 @@ const AdminDashboardHome = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="sm:flex   justify-between  items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
           <p className="text-gray-600">Monitor your platform's performance and activity</p>
@@ -193,12 +190,12 @@ const AdminDashboardHome = () => {
         <div className="flex flex-wrap items-center gap-4">
           <Calendar className="w-5 h-5 text-gray-600" />
           <span className="text-gray-700 font-medium">Time Period:</span>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 ">
             {(['daily', 'weekly', 'monthly'] as const).map((period) => (
               <button
                 key={period}
                 onClick={() => setTimePeriod(period)}
-                className={`px-4 py-2 rounded-lg transition ${
+                className={`px-4 py-2   rounded-lg transition ${
                   timePeriod === period
                     ? 'bg-[#2C7A7B] text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -224,11 +221,11 @@ const AdminDashboardHome = () => {
           <ActivityChart data={activityData} />
         </div>
 
-      <div className="flex  gap-6 ">       
-        <div className='w-[40%]'>
+      <div className="lg:flex space-y-2 gap-6 ">       
+        <div className='lg:w-[40%]'>
            <ResolutionMetrics data={resolutionRates || { totalRequests: 0, approvedRequests: 0, rejectedRequests: 0, pendingRequests: 0, resolutionRate: 0, averageResolutionTime: { hours: 0, days: 0 } }} />
         </div>
-        <div className='w-[60%] '>
+        <div className='lg:w-[60%] '>
             <ActiveUsersTable data={mostActiveUsers || []} />
         </div>
       </div>

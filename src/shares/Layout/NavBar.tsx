@@ -15,7 +15,8 @@ const NavBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+    return (storedUser && token) ? JSON.parse(storedUser) : null;
   });
 
   useEffect(() => {
@@ -26,13 +27,24 @@ const NavBar = () => {
     
     const handleStorageChange = () => {
       const storedUser = localStorage.getItem('user');
-      setUser(storedUser ? JSON.parse(storedUser) : null);
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      setUser((storedUser && token) ? JSON.parse(storedUser) : null);
     };
     window.addEventListener("storage", handleStorageChange);
+    
+    // Check auth status on mount and periodically
+    const checkAuth = () => {
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      setUser((storedUser && token) ? JSON.parse(storedUser) : null);
+    };
+    
+    const interval = setInterval(checkAuth, 1000);
     
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
     };
   }, []);
 
@@ -48,20 +60,27 @@ const NavBar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
           
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <Logo />
             </div>
 
             <div className="hidden md:flex items-center gap-4">
               <Search />
               {user ? (
-                <Link to={user.role === 'ADMIN' ? "/admin" : "/dashboard"}>
+                <Link to={user.role === 'admin' ? "/admin" : "/dashboard"}>
                   <button className="relative overflow-hidden group bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-0.5">
-                    <span className="relative z-10">{user.role === 'ADMIN' ? 'Admin Dashboard' : 'User Dashboard'}</span>
+                    <span className="relative z-10">{user.role === 'admin' ? 'Admin Dashboard' : 'User Dashboard'}</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-[#3a9a9c] to-[#2C7A7B] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </button>
                 </Link>
-              ): "" }
+              ) : (
+                <Link to="/auth">
+                  <button className="relative overflow-hidden group bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-0.5">
+                    <span className="relative z-10">Login</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#3a9a9c] to-[#2C7A7B] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </button>
+                </Link>
+              )}
             </div>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -86,12 +105,12 @@ const NavBar = () => {
               <Search />
               {user ? (
                 <Link
-                  to={user.role === 'ADMIN' ? "/admin" : "/dashboard"}
+                  to={user.role === 'admin' ? "/admin" : "/dashboard"}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-full"
                 >
                   <button className="w-full bg-[#2C7A7B] hover:bg-[#245f60] text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors duration-300 shadow-md">
-                    {user.role === 'ADMIN' ? 'Admin Dashboard' : 'User Dashboard'}
+                    {user.role === 'admin' ? 'Admin Dashboard' : 'User Dashboard'}
                   </button>
                 </Link>
               ) : (
