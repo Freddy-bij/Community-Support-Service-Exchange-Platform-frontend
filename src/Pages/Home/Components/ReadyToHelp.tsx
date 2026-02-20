@@ -35,9 +35,9 @@ const ReadyToHelp = () => {
             <p className="text-lg md:text-xl text-white/90 mb-10 leading-relaxed max-w-2xl mx-auto">
               Join thousands of community members who are connecting, helping, and making a difference together.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-wrap gap-4 justify-center items-center">
               <Link
-                to="/signup"
+                to="/auth"
                 className="group bg-white text-[#2C7A7B] px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
               >
                 Sign Up Free
@@ -45,7 +45,7 @@ const ReadyToHelp = () => {
               </Link>
               
               <Link
-                to="/about"
+                to=""
                 className="group bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/20 hover:border-white/50 transition-all duration-300"
               >
                 Learn More

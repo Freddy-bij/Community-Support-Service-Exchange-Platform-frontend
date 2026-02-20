@@ -187,7 +187,7 @@ const RequestsManagement = () => {
        
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className=" grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-xl shadow-sm">
           <div className="flex items-center justify-between">
             <div>
@@ -226,7 +226,7 @@ const RequestsManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl p-4 shadow-sm mb-6 flex gap-4">
+      <div className="bg-white rounded-xl p-4 shadow-sm mb-6 space-y-2 lg:flex gap-4">
         <div className="relative flex-1">
           <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
@@ -234,32 +234,39 @@ const RequestsManagement = () => {
             placeholder="Search by title or author..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+            className=" w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
           />
         </div>
-        <select
+        <div >
+           <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as "ALL" | "PENDING" | "APPROVED" | "REJECTED")}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+          className="px-4 w-full py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
         >
           <option value="ALL">All Status</option>
           <option value="PENDING">Pending</option>
           <option value="APPROVED">Approved</option>
           <option value="REJECTED">Rejected</option>
         </select>
-        <select
+        </div>
+
+        <div>
+           <select
           value={filter}
           onChange={(e) => setFilter(e.target.value as "ALL" | "REQUEST" | "OFFER")}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
+          className="px-4 py-2 border w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C7A7B] focus:border-transparent"
         >
           <option value="ALL">All Types</option>
           <option value="REQUEST">Requests Only</option>
           <option value="OFFER">Offers Only</option>
         </select>
+        </div>
+       
+       
          <div className="relative">
           <button
             onClick={() => setShowExportMenu(!showExportMenu)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2C7A7B] text-white rounded-lg hover:bg-[#235E5F] transition shadow-md"
+            className="flex w-full items-center gap-2 px-4 py-2 bg-[#2C7A7B] text-white rounded-lg hover:bg-[#235E5F] transition shadow-md"
           >
             <FiFileText size={16} />
             Export

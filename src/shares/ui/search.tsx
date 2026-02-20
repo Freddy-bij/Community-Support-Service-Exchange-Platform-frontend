@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-import { Link } from "react-router";
 
 const Search = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -29,7 +28,7 @@ const Search = () => {
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex  items-center gap-3">
       <div className="flex items-center gap-2 relative">
         <button
           onClick={handleToggle}
@@ -75,16 +74,8 @@ const Search = () => {
           </div>
         </div>
       </div>
-
-      <Link to="/auth">
-        <button className="relative overflow-hidden group bg-[#2C7A7B] hover:bg-[#245f60] text-white h-10 px-6 font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-0.5">
-          <span className="relative z-10">Login</span>
-          <div className="absolute inset-0 bg-gradient-to-r from-[#3a9a9c] to-[#2C7A7B] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        </button>
-      </Link>
-
       {isExpanded && (
-        <div className="sm:hidden fixed inset-x-0 top-20 bg-white border-b border-gray-200 p-4 shadow-lg z-40 animate-slideDown">
+        <div className="sm:hidden  w-full animate-slideDown">
           <div className="relative">
             <input
               type="text"

@@ -1,4 +1,6 @@
-const API_BASE_URL = 'https://community-support-flatform-backend-1-0ghf.onrender.com/';
+import { API_BASE_URL } from '../../../config/api';
+
+const API_URL = API_BASE_URL.replace('/api', '/');
 
 export class GetProfileService {
   private getToken(): string | null {

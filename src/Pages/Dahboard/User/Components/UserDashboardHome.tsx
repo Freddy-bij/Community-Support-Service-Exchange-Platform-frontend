@@ -150,7 +150,11 @@ const UserDashboardHome = () => {
 
       setLikedResponses(prev => {
         const newSet = new Set(prev);
-        isLiked ? newSet.delete(responseId) : newSet.add(responseId);
+        if (isLiked) {
+          newSet.delete(responseId);
+        } else {
+          newSet.add(responseId);
+        }
         return newSet;
       });
 
@@ -158,8 +162,8 @@ const UserDashboardHome = () => {
       setResponseLikedBy(prev => ({ ...prev, [responseId]: users }));
 
       toast.success(isLiked ? "Like removed" : "Response liked!");
-    } catch (err) {
-      console.error("Failed to like response:", err);
+    } catch (err: unknown) {
+      console.error("Failed to update like:", err);
       toast.error("Failed to update like. Please try again.");
     }
   };
@@ -194,20 +198,19 @@ const UserDashboardHome = () => {
         </div>
       )}
 
-      {/* User Profile Card */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl p-6  shadow-sm border border-gray-100 flex justify-between items-center gap-6">
         <div className="flex items-center gap-5">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#2C7A7B] to-[#235E5F] flex items-center justify-center text-white text-3xl font-bold shadow-md">
             {currentUser?.name?.charAt(0).toUpperCase() || "U"}
           </div>
           <div>
             <h3 className="text-2xl font-bold text-gray-900">{currentUser?.name || "User"}</h3>
-            <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+            <div className="sm:flex items-center gap-3 mt-1 text-sm text-gray-500">
               <span className="flex items-center gap-1">
                 <FiStar className="text-[#F59E0B]" size={16} />
                 <b className="text-gray-900">{averageRating}</b> Rating
               </span>
-              <span>|</span>
+              <span className="hidden sm:block">|</span>
               <span>
                 Joined{" "}
                 {new Date(currentUser?.createdAt || Date.now()).toLocaleDateString("en-US", {
